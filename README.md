@@ -1,4 +1,4 @@
-# Note from Cameron:
+## Note from Cameron:
 - Lab Prompts are uploaded
 - Lab instructions found below
 - Have a great Thanksgiving!
