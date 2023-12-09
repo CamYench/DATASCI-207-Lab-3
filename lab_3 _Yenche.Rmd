@@ -24,8 +24,8 @@ Specifically, this data set contains data for the 48 continental U.S. states fro
 load(file="./data/driving.RData")
 
 ## please comment these calls in your work 
-#glimpse(data)
-#desc
+glimpse(data)
+desc
 ```
 
 
@@ -117,13 +117,13 @@ names(data)[names(data) == "nghtfat"] <- "total_nighttime_fatalities"
 names(data)[names(data) == "wkndfat"] <- "total_weekend_fatalities"
 
 # Rename totfatpvm
-names(data)[names(data) == "totfatpvm"] <- "total_fatalities_per_100 mi"
+names(data)[names(data) == "totfatpvm"] <- "total_fatalities_per_100_mil"
 
 # Rename nghtfatpvm
-names(data)[names(data) == "nghtfatpvm"] <- "nighttime_fatalities_per_100 mi"
+names(data)[names(data) == "nghtfatpvm"] <- "nighttime_fatalities_per_100_mil"
 
 # Rename wkndfatpvm weekend fatalities per 100 mi
-names(data)[names(data) == "wkndfatpvm"] <- "weekend_fatalities_per_100_mi"
+names(data)[names(data) == "wkndfatpvm"] <- "weekend_fatalities_per_100_mil"
 
 # Rename statepop
 names(data)[names(data) == "statepop"] <- "state_population"
@@ -144,23 +144,25 @@ names(data)[names(data) == "sbprim"] <- "primary_seatbelt_law"
 names(data)[names(data) == "sbsecon"] <- "secondary_seatbelt_law"
 ```
 
-
-
-
 2. (5 points) Provide a description of the basic structure of the dataset. What is this data? How, where, and when is it collected? Is the data generated through a survey or some other method? Is the data that is presented a sample from the population, or is it a *census* that represents the entire population? Minimally, this should include:
     - How is the our dependent variable of interest `total_fatalities_rate` defined? 
-    
-```{r Data Structure Description}
 
+> 'The dataset contains panel data; there are 1200 observations and 56 variables that includes 25 years of data (1980-2004) that cover changes in various state drunk driving, seat belt, and speed limit laws within the 48 continental United States and the associated fatality statistics.'
 
-```
+> ' Below is an excerpt from wooldridge package (the source of the data) https://cran.r-project.org/web/packages/wooldridge/wooldridge.pdf (page 47):
+
+> 'Wooldridge Source: Freeman, D.G. (2007), “Drunk Driving Legislation and Traffic Fatalities: New Evidence on BAC 08 Laws,” Contemporary Economic Policy 25, 293–308. Professor Freeman kindly provided the data. Data loads lazily'
+
+> 'Further exploration of the data source (https://ideas.repec.org/a/bla/coecpo/v25y2007i3p293-308.html) reveals that the data is derived from U.S. state-level data. (Donald G. Freeman on google scholar: https://scholar.google.com/citations?user=aJvVDScAAAAJ&hl=en)
+
+> 'Based on the data being state-derived, it is highly likely that the data originates from police accident reports. This means that the total_falities_rate variable is the total number of fatalities, as reported by police accident reports (i.e., the number of fatalities that occured as a part of roadway accident per year in each respective state.'
+
 
 3. (20 points) Conduct a very thorough EDA, which should include both graphical and tabular techniques, on the dataset, including both the dependent variable `total_fatalities_rate` and the potential explanatory variables. Minimally, this should include: 
     - How is the our dependent variable of interest `total_fatalities_rate` defined? 
     - What is the average of `total_fatalities_rate` in each of the years in the time period covered in this dataset? 
 
 ```{r EDA}
-
 
 ```
 
