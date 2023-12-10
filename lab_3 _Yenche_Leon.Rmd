@@ -7,6 +7,11 @@ output:
 
 ```{r load packages, echo=FALSE, message=FALSE}
 library(tidyverse)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(reshape2)
+library(ggthemes)
 ```
 
 
@@ -170,11 +175,9 @@ names(data)[names(data) == "sbsecon"] <- "secondary_seatbelt_law"
 
 3. (20 points) Conduct a very thorough EDA, which should include both graphical and tabular techniques, on the dataset, including both the dependent variable `total_fatalities_rate` and the potential explanatory variables. Minimally, this should include: 
     - How is the our dependent variable of interest `total_fatalities_rate` defined? 
-```{r states}
+```{r EDA states}
 table(data$state_alpha)
 table(data$year)
-
-
 ```
 >'Here we have observations of 48 units over 25 time periods (1 year), we have a balanced panel structure because each unit has the same number of observations over time.'
 
@@ -199,16 +202,12 @@ geom_boxplot(alpha=0.4) +
 theme(legend.position="none",axis.text.y=element_text(size=6)) +
 scale_y_continuous() +
 xlab("State") +
-ylab("Total Fatalities") +
+ylab("Total Fatalities Rate (per 100,000)") +
 coord_flip()
-
-
-
-
 ```
->'We see strong differences in Total Fatalities across states, suggesting that fixed effects are important for controlling for unobserved differences.'
+>'We see strong differences in Total Fatalities Rate across states, suggesting that fixed effects are important for controlling for unobserved differences.'
 
-```{r change time}
+```{r EDA change time}
 data %>%
 ggplot(aes(year,total_fatalities_rate,color=state_alpha)) +
 geom_point(alpha=0.4) +
@@ -220,22 +219,8 @@ theme(strip.text=element_text(size=4)) +
 scale_y_continuous() +
 xlab("State") +
 ylab("Total Fatalities")
-
-
-
 ```
 >'Most states have a close to zero change over time, except for ND, CO, and NM, those states show a strong down slope over time.'
-
-```{r install melt}
-# Install the package (if not already installed)
-
-install.packages("reshape2")
-
-# Load the package
-
-library(reshape2)
-
-```
 
 ```{r EDA causes1}
 
@@ -243,6 +228,7 @@ library(reshape2)
 
 
 ```
+
 ```{r EDA Analyze trend from specific states}
 # Randomly select states to analyze
 selected_states <- sample(1:48, 10)
@@ -257,7 +243,28 @@ ggplot(selected_state_data , aes(x = year, y = total_fatalities_rate, color = se
   labs(title = "Total Fatalities Rate Over the Years for Selected States",
        x = "Year", y = "Total Fatalities Rate (per 100,000)")
 ```
+```{r EDA Correlation Heatmap}
+# Specify the columns you want to keep
+columns_to_keep <- c("state_alpha", "year", "total_fatalities_rate", "primary_seatbelt_law", "secondary_seatbelt_law", "speed_limit", "bac_limit", "zero_tolerance_law", "graduated_drivers_license_law", "per_se_law", "minimum_drinking_age", "unemployment_rate_percent", "state_population", "seatbelt")
 
+# Create a new dataset with only the selected columns
+data_slim <- data[, columns_to_keep, drop = FALSE]
+
+data_slim %>%
+  select(-c(state_alpha, year, total_fatalities_rate)) %>%
+  mutate_all(as.numeric) %>%  # Convert all columns to numeric
+  cor() %>%
+  melt() %>%
+  ggplot(aes(Var1, Var2, fill = value)) +
+  geom_tile() +
+  theme_economist_white(gray_bg = FALSE) +
+  theme(legend.title = element_blank(), legend.text = element_text(size = 10),
+        axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)) +
+  scale_fill_gradient2(low = "cornflowerblue", high = "coral", mid = "white",
+                       midpoint = 0, limit = c(-1, 1)) +
+  xlab("State") +
+  ylab("Total Fatalities Rate")
+```
 As with every EDA this semester, the goal of this EDA is not to document your own process of discovery -- save that for an exploration notebook -- but instead it is to bring a reader that is new to the data to a full understanding of the important features of your data as quickly as possible. In order to do this, your EDA should include a detailed, orderly narrative description of what you want your reader to know. Do not include any output -- tables, plots, or statistics -- that you do not intend to write about.
 
 # (15 points) Preliminary Model
