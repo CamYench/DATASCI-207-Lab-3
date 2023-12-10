@@ -36,6 +36,7 @@ desc
     - Produce a new variable, called `year_of_observation` that re-encodes the data that is in `d80`, `d81`, ... , `d04`. 
     - Produce a new variable for each of the other variables that are one-hot encoded (i.e. `bac*` variable series). 
     - Rename these variables to sensible names that are legible to a reader of your analysis. For example, the dependent variable as provided is called, `totfatrte`. Pick something more sensible, like, `total_fatalities_rate`. There are few enough of these variables to change, that you should change them for all the variables in the data. (You will thank yourself later.)
+    
 ```{r inspect data}
 # Check the first few rows of the data
 head(data)
@@ -119,14 +120,23 @@ names(data)[names(data) == "wkndfat"] <- "total_weekend_fatalities"
 # Rename totfatpvm
 names(data)[names(data) == "totfatpvm"] <- "total_fatalities_per_100_mil"
 
-# Rename nghtfatpvm
+# Rename nghtfatpvm 
 names(data)[names(data) == "nghtfatpvm"] <- "nighttime_fatalities_per_100_mil"
 
-# Rename wkndfatpvm weekend fatalities per 100 mi
+# Rename wkndfatpvm
 names(data)[names(data) == "wkndfatpvm"] <- "weekend_fatalities_per_100_mil"
 
 # Rename statepop
 names(data)[names(data) == "statepop"] <- "state_population"
+
+# Rename totfatrte
+names(data)[names(data) == "totfatrte"] <- "total_fatalities_rate"
+
+# Rename nghtfatrte
+names(data)[names(data) == "nghtfatrte"] <- "total_night_fatalities_rate"
+
+# Rename wkndfatrte
+names(data)[names(data) == "wkndfatrte"] <- "total_weekend_fatalities_rate"
 
 # Rename vehicmiles
 names(data)[names(data) == "vehicmiles"] <- "vehicle_miles_billions"
@@ -155,17 +165,36 @@ names(data)[names(data) == "sbsecon"] <- "secondary_seatbelt_law"
 
 > 'Further exploration of the data source (https://ideas.repec.org/a/bla/coecpo/v25y2007i3p293-308.html) reveals that the data is derived from U.S. state-level data. (Donald G. Freeman on google scholar: https://scholar.google.com/citations?user=aJvVDScAAAAJ&hl=en)
 
-> 'Based on the data being state-derived, it is highly likely that the data originates from police accident reports. This means that the total_falities_rate variable is the total number of fatalities, as reported by police accident reports (i.e., the number of fatalities that occured as a part of roadway accident per year in each respective state.'
+> 'Based on the data being state-derived, it is highly likely that the data originates from police accident reports. This means that the total_falities_rate variable is the total number of fatalities for the state, as reported by police accident reports, divided by the state_population variable (i.e., the number of fatalities that occured as a part of roadway accident per year in each respective state divided by the state population).'
 
 
 3. (20 points) Conduct a very thorough EDA, which should include both graphical and tabular techniques, on the dataset, including both the dependent variable `total_fatalities_rate` and the potential explanatory variables. Minimally, this should include: 
     - How is the our dependent variable of interest `total_fatalities_rate` defined? 
     - What is the average of `total_fatalities_rate` in each of the years in the time period covered in this dataset? 
 
-```{r EDA}
-
+```{r EDA: Missing Values}
+# Check for missing values
+missing_values <- colSums(is.na(data))
+print(missing_values)
+```
+```{r EDA Summary}
+summary(data$total_fatalities_rate)
 ```
 
+```{r EDA Analyze trend from specific states}
+# Randomly select states to analyze
+selected_states <- sample(1:48, 10)
+selected_state_data  <- data[data$state %in% selected_states,]
+
+# Drop rows with NA values in 'total_fatalities_rate' or 'year_of_observation' (get's rid of irrelevant state data that populate as NAs)
+selected_state_data <- na.omit(selected_state_data [, c("year","year_of_observation", "state_alpha", "total_fatalities_rate")])
+
+# Plot total_fatalities_rate over the years
+ggplot(selected_state_data , aes(x = year, y = total_fatalities_rate, color = selected_state_data$state)) +
+  geom_line() +
+  labs(title = "Total Fatalities Rate Over the Years for Selected States",
+       x = "Year", y = "Total Fatalities Rate (per 100,000)")
+```
 
 As with every EDA this semester, the goal of this EDA is not to document your own process of discovery -- save that for an exploration notebook -- but instead it is to bring a reader that is new to the data to a full understanding of the important features of your data as quickly as possible. In order to do this, your EDA should include a detailed, orderly narrative description of what you want your reader to know. Do not include any output -- tables, plots, or statistics -- that you do not intend to write about.
 
