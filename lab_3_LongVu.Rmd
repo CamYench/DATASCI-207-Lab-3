@@ -62,7 +62,8 @@ data <- data %>% mutate(
                                 d88 + d89 + d90 + d91 + d92 + d93 + d94 + d95 +
                                 d96 + d97 + d98 + d99 + d00 + d01 + d02 + d03 + d04),
   year_of_observation = as.character(year_of_observation),
-  bld_alc_lmt = bac10 * 0.1 + bac08 * 0.08
+  bld_alc_lmt = bac10 * 0.1 + bac08 * 0.08, 
+  veh_mile_trav_percap = vehicmiles/statepop
 )
 
 data <- rename(data, speed_lim_55 = sl55,
@@ -151,25 +152,23 @@ Estimate a linear regression model of *totfatrte* on a set of dummy variables fo
 
 ```{r Preliminary Model, echo = FALSE, warning = FALSE, message = FALSE}
 pdata <- pdata.frame(data, index = c("year", "state")) 
-pre_model <- plm(tot_fata_per_100th_pop ~ d80 + d81 + d82 + d83 + d84 + d85 + d86 + d87 + d88 + d89 + d90 +
-                   d91 + d92 + d93 + d94 + d95 + d96 + d97 + d98 + d99 + d00 + d01 + d02 + d03 + d04, data = pdata, 
+pre_model <- plm(tot_fata_per_100th_pop ~ year, data = pdata, 
                  index = c("year", "state"), 
                  effect = "individual", model = "pooling")
 summary(pre_model)
 
-
-plot(a[1:nrow(a),2], a[1:nrow(a),1], xlab = "Fitted Value", ylab = "Residuals") 
+pre_resid_fitted <- cbind(pre_model$residuals, pre_model$model[[1]] - pre_model$residuals)
+plot(pre_resid_fitted[1:nrow(pre_resid_fitted),2], pre_resid_fitted[1:nrow(pre_resid_fitted),1], xlab = "Fitted Value", ylab = "Residuals") 
 
 
 ```
 The EDA shows a series of correlation between the response variable (total traffic fatality rate) and explanatory variables. As a result, a linear model is an appropriate approach to forecast the total traffic fatality rate. 
 
-The model uses `d04` (2004 indicator) as the base. Based on the output of the model, each and every year prior to 2004 has a higher fatality rate. From 1980 to 1990, the p-values of the coefficient estimates show that the difference in fatalities in these years is statistically significant. However from 1991, the coefficient estimates are no longer statistically significant. This suggests that the fatality rate does not just change overtime and there are other omitted variables that impact the fatality rates. 
+The model uses `1980` as the base year. Based on the output of the model, beside year `1981`, all other subsequent years have statistically significant impact on total traffic fatalities. The coefficient estimates of all years are negative, indicating a decrease in total fatalities from the `1980`. 
 
-Because it's likely that there are omitted variables within the model, the parameter estimates are not reliable and likely overestimate/underestimate the impact of time on fatalities rate. One omitted variable that we suspect is the enforcement of traffic law which happened in the later years (1980 as the reference). The enforced traffic law would likely reduce the fatalities rate (as shown in the EDA section), which would imply that the impact from years on traffic fatalities is less than what the above model shows. 
+It's likely that there are omitted variables within the model, the parameter estimates are not reliable and likely overestimate/underestimate the impact of time on fatalities rate. One omitted variable that we suspect is the enforcement of traffic law which happened in the later years (1980 as the reference). The enforced traffic law would likely reduce the fatalities rate (as shown in the EDA section), which would imply that the impact from years on traffic fatalities is less than what the above model shows. 
 
-The residual versus fitted values plot shows that there is a relationship between the model residuals and the fitted values. This suggests that the model uncertainty estimates are not reliable and maybe biased. 
-
+Because the uncertainty of the model likely includes the effect of omitted variables, the uncertainty of the model is not reliable and may be biased. 
 
 # (15 points) Expanded Model 
 
@@ -192,8 +191,26 @@ If it is appropriate, include transformations of these variables. Please careful
 - Does having a primary seat belt law? 
 
 ```{r Expand model, echo = FALSE, message = FALSE, warning = FALSE}
+exp_model <- plm(tot_fata_per_100th_pop ~ year + bld_alc_lmt + per_se_law + prim_seatbelt_law 
+                 + second_seatbelt_law + speed_lim_grter70 + grad_driver_license_law +                                                    age1424_pop_percent + unemp_rate + veh_mile_trav_percap, data = pdata, 
+                 index = c("year", "state"), 
+                 effect = "individual", model = "pooling")
+summary(exp_model)
 
+exp_resid_fitted <- cbind(exp_model$residuals, exp_model$model[[1]] - exp_model$residuals)
+plot(exp_resid_fitted[1:nrow(exp_resid_fitted),2], exp_resid_fitted[1:nrow(exp_resid_fitted),1], xlab = "Fitted Value", ylab = "Residuals") 
+
+lines(predict(lm(exp_resid_fitted[1:nrow(exp_resid_fitted),1]~exp_resid_fitted[1:nrow(exp_resid_fitted),2])),col='red')
 ```
+The team performed the following transformation on the raw dataset:
+ - Generate a new variable to re-encode the blood-alcohol-limit columns (0.1 and 0.08). The values included in this variable is the sum product of variable `bld_alc_lim10` (named `bac10` in the raw data) with 0.10 and variable `bld_alc_lim08` (named `bac08` in the raw data) with 0.08. This new variable represents the actual blood alcohol limit in a given year (if both rules were enforced in the same year, then the value would be the weighted average blood alcohol limit of the two limits) 
+ - Generate a new variable to reflect miles travel per capita (total miles divided by state population)
+ 
+ 
+From the output of the expanded model, r-squared increased from `r summary(pre_model)$r.squared[2]` to `r summary(exp_model)$r.squared[2]`, which indicates that the new model provides a significant increase of the explanation for the variance in the response variable. The coefficients for the years dummy variables also are smaller than the ones from the preliminary model. This confirms the suspicion that the impact on traffic fatalities rate from the time variable in the preliminary model was overestimated. Overall, we observed that impacts from `blood alcohol limit`, `per se law`, `speed limit law`, `unemployment rate` and `vehicle miles travel per capita` are statistically different from zero. Interestingly, some of the enforced laws such as `primary and secondary seatbelt law` and `graduate driver license law` did not seem to have a significant impact on the traffic fatalities. 
+
+The `per se law` has a negative slope, which means that having the law enforced reduces the total traffic fatalities by `r coef(exp_model)[27]`. This confirms with the findings of our EDA. 
+
 
 # (15 points) State-Level Fixed Effects 
 
@@ -207,6 +224,48 @@ Which set of estimates do you think is more reliable? Why do you think this?
 
 - What assumptions are needed in each of these models?  
 - Are these assumptions reasonable in the current context?
+
+
+```{r State-Level Fixed Effects}
+statefe_model <- plm(tot_fata_per_100th_pop ~ year + state + bld_alc_lmt +per_se_law + prim_seatbelt_law 
+                     + second_seatbelt_law + speed_lim_grter70 + grad_driver_license_law +                                                    age1424_pop_percent + unemp_rate + veh_mile_trav_percap, data = pdata, 
+                 index = c("year", "state"), 
+                 effect = "individual", model = "pooling")
+summary(statefe_model)
+
+statefe_resid_fitted <- cbind(statefe_model$residuals, statefe_model$model[[1]] - statefe_model$residuals)
+plot(statefe_resid_fitted[1:nrow(statefe_resid_fitted),2], statefe_resid_fitted[1:nrow(statefe_resid_fitted),1], xlab = "Fitted Value", ylab = "Residuals") 
+
+lines(predict(lm(statefe_resid_fitted[1:nrow(statefe_resid_fitted),1]~statefe_resid_fitted[1:nrow(statefe_resid_fitted),2])),col='red')
+
+statefe.df  <- data %>% dplyr::select(bld_alc_lmt, per_se_law, prim_seatbelt_law, second_seatbelt_law, speed_lim_grter70,
+                                     grad_driver_license_law, age1424_pop_percent, unemp_rate, veh_mile_trav_percap) 
+statefe.df <- statefe.df %>% mutate(
+  mod_resid = statefe_model$residuals
+)
+
+ggpairs(statefe.df, column = 1:10)
+
+pdwtest(statefe_model)
+```
+The coefficient estimate for blood alcohol level changes from `r coef(exp_model)[26]` in the expanded model to `r coef(statefe_model)[73]` in the expanded model with state level fixed effect. 
+
+The coefficient estimate for per se law changes from `r coef(exp_model)[27]` in the expanded model to `r coef(statefe_model)[74]` in the expanded model with state level fixed effect. 
+
+The coefficient estimate for primary seat-belt law changes from `r coef(exp_model)[28]` in the expanded model to `r coef(statefe_mdoel)[75]` in the expanded model with state level fixed effect.
+
+Both models seem to have residuals with zero mean and a mild level of heteroskedaticity, however, the t statistics of all three estimates are higher in the state-level fixed effect model, which indicates a narrower confidence interval for these estimates. As a result, we find the estimates of the state-level fixed effect model to be more reliable. 
+
+For the estimates to be consisted, the model needs to satisfy the following assumptions: 
+ - The model is linear in parameters, the residual vs fitted value shows no pattern between the residuals and the model's fitted value, which indicate linearity. 
+ - The observations are independent across individuals but not necessarily across time. This assumption may be difficult to satisfy as individuals in close by states may share similar characteristics. 
+ - The regressors are not perfectly collinear and all regressors have non-zero variance and not too many extreme values. Based on the pair plots in the EDA section, it's unlikely that the regressors have perfect multicolinearity, or zero variance or contain too many extreme values. 
+ - The error term is uncorrelated with all explanatory variables across all time period. The pair plot above shows that the residuals is not correlated with any explanatory variables within the model. 
+ - Error term is homoskedastic and serially uncorrelated across time. The Durbin-Watson test shows a p-value of 0.988, which indicates that there is no serial correlation in the error term and satisfied this assumption. 
+ 
+
+Although the residuals does show some level of heteroskasticity, the level is mild and thus we conclude that the homoskedasticity assumption was not violated. 
+
 
 # (10 points) Consider a Random Effects Model 
 
