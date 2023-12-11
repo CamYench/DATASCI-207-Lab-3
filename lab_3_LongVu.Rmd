@@ -52,7 +52,7 @@ desc
 
 ```{r features creation, warning=FALSE, echo=FALSE, message=FALSE}
 data <- data %>% mutate(
-  speed_limit = sl55 * 55 + sl65 * 65 + sl70 * 70 + sl75 * 75 + slnone * 0,
+  speed_limit = sl55 * 55 + sl65 * 65 + sl70 * 70 + sl75 * 75 + slnone * 200,
   speed_limit_bin = case_when((speed_limit <55 ) ~ "No speed limit",
                               (speed_limit >= 55) & (speed_limit < 65) ~ "Between 55 and 65",
                               (speed_limit >= 65) & (speed_limit < 70) ~ "Between 65 and 70",
@@ -63,8 +63,19 @@ data <- data %>% mutate(
                                 d96 + d97 + d98 + d99 + d00 + d01 + d02 + d03 + d04),
   year_of_observation = as.character(year_of_observation),
   bld_alc_lmt = bac10 * 0.1 + bac08 * 0.08, 
+  bld_alc_lmt = case_when((bld_alc_lmt == 0) ~ 0.5, 
+                          (bld_alc_lmt > 0) ~ bld_alc_lmt),
   veh_mile_trav_percap = vehicmiles/statepop
 )
+
+uniq_state_num <- data %>% dplyr::select(state) %>% unique() 
+uniq_state_name <- c("AL", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY")
+
+uniq_state <- uniq_state_num %>% mutate(
+  uniq_state_name = uniq_state_name
+)
+
+data <- left_join(data, uniq_state, by = "state")
 
 data <- rename(data, speed_lim_55 = sl55,
                      speed_lim_65 = sl65,
@@ -92,7 +103,8 @@ data <- rename(data, speed_lim_55 = sl55,
                      age1424_pop_percent = perc14_24,
                      speed_lim_grter70 = sl70plus,
                      prim_seatbelt_law = sbprim,
-                     second_seatbelt_law = sbsecon) 
+                     second_seatbelt_law = sbsecon, 
+                     state_name = uniq_state_name)
 ```
 
 2. (5 points) Provide a description of the basic structure of the dataset. What is this data? How, where, and when is it collected? Is the data generated through a survey or some other method? Is the data that is presented a sample from the population, or is it a *census* that represents the entire population? Minimally, this should include:
@@ -111,21 +123,19 @@ Besides fatilities data, the dataset also consists of traffic law data (speed li
 As with every EDA this semester, the goal of this EDA is not to document your own process of discovery -- save that for an exploration notebook -- but instead it is to bring a reader that is new to the data to a full understanding of the important features of your data as quickly as possible. In order to do this, your EDA should include a detailed, orderly narrative description of what you want your reader to know. Do not include any output -- tables, plots, or statistics -- that you do not intend to write about.
 
 ```{r EDA, message=FALSE, echo=FALSE, warning=FALSE}
-data %>% ggplot(aes(x = year, y = tot_fata_per_100th_pop)) + geom_line() + ggtitle("Total Trafic Fatalities Over Years")
-data %>% ggplot(aes(x = year, y = tot_fata_per_100th_pop)) + geom_line() + facet_wrap(~state) + ggtitle("Total Trafic Fatilities Over Years by States")
-data %>% ggplot() + geom_boxplot(aes(y = tot_fata_per_100th_pop, x = factor(state))) + ggtitle("Total Trafic Fatalities by States")
+data %>% ggplot(aes(x = year, y = tot_fata_per_100th_pop)) + geom_line() + facet_wrap(~state_name) + ggtitle("Total Trafic Fatilities Over Years by States")
+data %>% ggplot() + geom_boxplot(aes(y = tot_fata_per_100th_pop, x = factor(state_name))) + ggtitle("Total Trafic Fatalities by States")
 data %>% ggplot() + geom_boxplot(aes(y = tot_fata_per_100th_pop, x = factor(year))) + ggtitle("Total Trafic Fatalities by Year")
 data %>% ggplot() + geom_boxplot(aes(y = tot_fata_per_100th_pop, x = factor(speed_limit_bin))) + ggtitle("Total Trafic Fatalitites by Speed Limit Category")
 data2 <- data %>% dplyr::select(tot_fata_per_100th_pop, night_fata_per_100th_pop, wkend_fata_per_100th_pop,
                          unemp_rate, age1424_pop_percent, veh_mile_trav)
 ggpairs(data2, columns = 1:6)
-data %>% ggplot() + geom_point(aes(y = tot_fata_per_100th_pop, x = night_fata_per_100th_pop)) + geom_smooth(aes(y = tot_fata_per_100th_pop, x = night_fata_per_100th_pop)) + facet_wrap(~state) + ggtitle("Total Fatalities vs Night Fatalities by State")
-data %>% ggplot() + geom_point(aes(y = tot_fata_per_100th_pop, x = wkend_fata_per_100th_pop)) + geom_smooth(aes(y = tot_fata_per_100th_pop, x = wkend_fata_per_100th_pop)) + facet_wrap(~state) + ggtitle("Total Fatalities vs Weekend Fatalities by State")
-data %>% ggplot() + geom_point(aes(y = tot_fata_per_100th_pop, x = unemp_rate)) + geom_smooth(aes(y = tot_fata_per_100th_pop, x = unemp_rate)) + facet_wrap(~state) + ggtitle("Total Fatalities vs Unemployment by State")
-data %>% ggplot() + geom_point(aes(y = tot_fata_per_100th_pop, x = age1424_pop_percent)) + geom_smooth(aes(y = tot_fata_per_100th_pop, x = age1424_pop_percent)) + facet_wrap(~state) + ggtitle("Total Fatalities vs Percent of People Younger than 24 by State")
-data %>% ggplot() + geom_point(aes(y = tot_fata_per_100th_pop, x = veh_mile_trav)) + geom_smooth(aes(y = tot_fata_per_100th_pop, x = veh_mile_trav)) + facet_wrap(~state) + ggtitle("Total Fatalities vs Miles Traveling")
+data %>% ggplot() + geom_point(aes(y = tot_fata_per_100th_pop, x = night_fata_per_100th_pop)) + geom_smooth(aes(y = tot_fata_per_100th_pop, x = night_fata_per_100th_pop)) + facet_wrap(~state_name) + ggtitle("Total Fatalities vs Night Fatalities by State")
+data %>% ggplot() + geom_point(aes(y = tot_fata_per_100th_pop, x = wkend_fata_per_100th_pop)) + geom_smooth(aes(y = tot_fata_per_100th_pop, x = wkend_fata_per_100th_pop)) + facet_wrap(~state_name) + ggtitle("Total Fatalities vs Weekend Fatalities by State")
+data %>% ggplot() + geom_point(aes(y = tot_fata_per_100th_pop, x = unemp_rate)) + geom_smooth(aes(y = tot_fata_per_100th_pop, x = unemp_rate)) + facet_wrap(~state_name) + ggtitle("Total Fatalities vs Unemployment by State")
+data %>% ggplot() + geom_point(aes(y = tot_fata_per_100th_pop, x = age1424_pop_percent)) + geom_smooth(aes(y = tot_fata_per_100th_pop, x = age1424_pop_percent)) + facet_wrap(~state_name) + ggtitle("Total Fatalities vs Percent of People Younger than 24 by State")
+data %>% ggplot() + geom_point(aes(y = tot_fata_per_100th_pop, x = veh_mile_trav)) + geom_smooth(aes(y = tot_fata_per_100th_pop, x = veh_mile_trav)) + facet_wrap(~state_name) + ggtitle("Total Fatalities vs Miles Traveling")
 data %>% ggplot() + geom_boxplot(aes(y = tot_fata_per_100th_pop, x = factor(bld_alc_lmt))) + ggtitle("Total Fatilities by Blood Alcohol Limit")
-
 data %>% ggplot() + geom_boxplot(aes(y = tot_fata_per_100th_pop, x = factor(per_se_law))) + ggtitle("Total Fatalities based on Per Se Law")
 data %>% ggplot() + geom_boxplot(aes(y = tot_fata_per_100th_pop, x = factor(seatbelt_law))) + ggtitle("Total Fatalities based on Seatbelt Law")
 data %>% ggplot() + geom_boxplot(aes(y = tot_fata_per_100th_pop, x = factor(zero_tol_law))) + ggtitle("Total Fatalities based on Zero Tolerance Law")
@@ -151,9 +161,9 @@ Estimate a linear regression model of *totfatrte* on a set of dummy variables fo
     - Are the uncertainty estimate reliable, unbiased estimates of sampling based variability? Or, are they biased due to the way that the data is structured? 
 
 ```{r Preliminary Model, echo = FALSE, warning = FALSE, message = FALSE}
-pdata <- pdata.frame(data, index = c("year", "state")) 
-pre_model <- plm(tot_fata_per_100th_pop ~ year, data = pdata, 
-                 index = c("year", "state"), 
+pdata <- pdata.frame(data, index = c("state_name", "year")) 
+pre_model <- plm(tot_fata_per_100th_pop ~ year, data = data, 
+                 index = c("state_name", "year"), 
                  effect = "individual", model = "pooling")
 summary(pre_model)
 
@@ -192,8 +202,8 @@ If it is appropriate, include transformations of these variables. Please careful
 
 ```{r Expand model, echo = FALSE, message = FALSE, warning = FALSE}
 exp_model <- plm(tot_fata_per_100th_pop ~ year + bld_alc_lmt + per_se_law + prim_seatbelt_law 
-                 + second_seatbelt_law + speed_lim_grter70 + grad_driver_license_law +                                                    age1424_pop_percent + unemp_rate + veh_mile_trav_percap, data = pdata, 
-                 index = c("year", "state"), 
+                 + second_seatbelt_law + speed_lim_grter70 + grad_driver_license_law +                                                    age1424_pop_percent + unemp_rate + veh_mile_trav_percap, data = data, 
+                 index = c("state_name", "year"), 
                  effect = "individual", model = "pooling")
 summary(exp_model)
 
@@ -226,11 +236,11 @@ Which set of estimates do you think is more reliable? Why do you think this?
 - Are these assumptions reasonable in the current context?
 
 
-```{r State-Level Fixed Effects}
-statefe_model <- plm(tot_fata_per_100th_pop ~ year + state + bld_alc_lmt +per_se_law + prim_seatbelt_law 
-                     + second_seatbelt_law + speed_lim_grter70 + grad_driver_license_law +                                                    age1424_pop_percent + unemp_rate + veh_mile_trav_percap, data = pdata, 
-                 index = c("year", "state"), 
-                 effect = "individual", model = "pooling")
+```{r State-Level Fixed Effects, echo = FALSE, warning = FALSE, message = FALSE}
+statefe_model <- plm(tot_fata_per_100th_pop ~ year + bld_alc_lmt +per_se_law + prim_seatbelt_law 
+                     + second_seatbelt_law + speed_lim_grter70 + grad_driver_license_law +                                                    age1424_pop_percent + unemp_rate + veh_mile_trav_percap, data = data, 
+                 index = c("state_name", "year"), 
+                 effect = "individual", model = "within")
 summary(statefe_model)
 
 statefe_resid_fitted <- cbind(statefe_model$residuals, statefe_model$model[[1]] - statefe_model$residuals)
@@ -247,6 +257,10 @@ statefe.df <- statefe.df %>% mutate(
 ggpairs(statefe.df, column = 1:10)
 
 pdwtest(statefe_model)
+
+pcdtest(statefe_model, test = "lm")
+
+pFtest(statefe_model, exp_model)
 ```
 The coefficient estimate for blood alcohol level changes from `r coef(exp_model)[26]` in the expanded model to `r coef(statefe_model)[73]` in the expanded model with state level fixed effect. 
 
@@ -261,11 +275,10 @@ For the estimates to be consisted, the model needs to satisfy the following assu
  - The observations are independent across individuals but not necessarily across time. This assumption may be difficult to satisfy as individuals in close by states may share similar characteristics. 
  - The regressors are not perfectly collinear and all regressors have non-zero variance and not too many extreme values. Based on the pair plots in the EDA section, it's unlikely that the regressors have perfect multicolinearity, or zero variance or contain too many extreme values. 
  - The error term is uncorrelated with all explanatory variables across all time period. The pair plot above shows that the residuals is not correlated with any explanatory variables within the model. 
- - Error term is homoskedastic and serially uncorrelated across time. The Durbin-Watson test shows a p-value of 0.988, which indicates that there is no serial correlation in the error term and satisfied this assumption. 
+ - Error term is homoskedastic and serially uncorrelated across time. The Durbin-Watson test shows a p-value of 0.988, which indicates that there is no serial correlation in the error term and satisfied this assumption. The Breusch-Pagan test indicates that the standard error is heteroskedasitc and robust standard error is a more appropriate method to determine confidence inteval for the coefficient estimates. 
  
-
-Although the residuals does show some level of heteroskasticity, the level is mild and thus we conclude that the homoskedasticity assumption was not violated. 
-
+The F test for individual effects indicates that we reject the null hypothesis of no fixed effects and thus the state-level fixed effect model provides more reliable coefficient estimates. 
+ 
 
 # (10 points) Consider a Random Effects Model 
 
@@ -274,6 +287,34 @@ Instead of estimating a fixed effects model, should you have estimated a random 
 - Please state the assumptions of a random effects model, and evaluate whether these assumptions are met in the data. 
 - If the assumptions are, in fact, met in the data, then estimate a random effects model and interpret the coefficients of this model. Comment on how, if at all, the estimates from this model have changed compared to the fixed effects model. 
 - If the assumptions are **not** met, then do not estimate the data. But, also comment on what the consequences would be if you were to *inappropriately* estimate a random effects model. Would your coefficient estimates be biased or not? Would your standard error estimates be biased or not? Or, would there be some other problem that might arise?
+
+```{r random effect model, echo =FALSE, wanring = FALSE, message = FALSE}
+statere_model <- plm(tot_fata_per_100th_pop ~ year + bld_alc_lmt +per_se_law + prim_seatbelt_law 
+                     + second_seatbelt_law + speed_lim_grter70 + grad_driver_license_law +                                                    age1424_pop_percent + unemp_rate + veh_mile_trav_percap, data = data, 
+                 index = c("state_name", "year"), 
+                 effect = "individual", model = "random")
+summary(statere_model)
+
+statere_resid_fitted <- cbind(statere_model$residuals, statere_model$model[[1]] - statere_model$residuals)
+plot(statere_resid_fitted[1:nrow(statere_resid_fitted),2], statere_resid_fitted[1:nrow(statere_resid_fitted),1], xlab = "Fitted Value", ylab = "Residuals") 
+
+lines(predict(lm(statere_resid_fitted[1:nrow(statere_resid_fitted),1]~statere_resid_fitted[1:nrow(statere_resid_fitted),2])),col='red')
+
+phtest(statefe_model, statere_model)
+```
+
+The random effect model uses all of the assumptions applied to the fixed model with the addition of the following assumptions: 
+ - The unobserved effect is uncorrelated to all explanatory variables. This assumes the fixed effects at the state level are not correlated to the explanatory variable such as per se law, miles travel per, and speed limit. 
+ - The expected value of the unobserved effect given the explanatory variables is constant. 
+ - The variance of the unobserved effect given the explanatory variables is constant. 
+ 
+The first random effect assumption may likely be violated. The time-constant effect such as state location may have an impact on speed limit, which in turn may impact total fatalities rate. In addition, the location effect or state population may have an impact on miles travel per capita which in turn may impact total fatalities rate. 
+
+If this assumption is violated, coefficient estimates become biased and not as reliable as the fixed effect model. 
+
+For comparison purposes, we developed the random effect model to confirm our evaluation of the model assumptions. 
+
+The p-value of the Hausman test is less than 0.05, which means that we reject the null hypothese that the random effect model is appropriate. The test result also agrees with our evaluations of the random effect assumption and suggests that fixed effect model is a more appropriate approach. 
 
 # (10 points) Model Forecasts 
 
@@ -287,6 +328,10 @@ Now, use these changes in driving to make forecasts from your models.
 
 - Suppose that the number of miles driven per capita, increased by as much as the COVID boom. Using the FE estimates, what would the consequences be on the number of traffic fatalities? Please interpret the estimate.
 - Suppose that the number of miles driven per capita, decreased by as much as the COVID bust. Using the FE estimates, what would the consequences be on the number of traffic fatalities? Please interpret the estimate.
+
+```{r forecast, echo = FALSE, message = FALSE, warning = FALSE}
+
+```
 
 # (5 points) Evaluate Error 
 
