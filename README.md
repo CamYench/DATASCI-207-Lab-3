@@ -1,8 +1,3 @@
-## Note from Cameron:
-- Lab Prompts are uploaded
-- Lab instructions found below
-- Have a great Thanksgiving!
-
 # Lab Instructions
 
 In this lab, you are going to apply what you have learned about panel models to a dataset of traffic accidents in the United States. This will allow you to use the tools that you have developed in the panel modeling section of this course. 
