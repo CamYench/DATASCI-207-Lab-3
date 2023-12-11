@@ -260,7 +260,7 @@ columns_to_keep <- c("state_alpha", "year", "total_fatalities_rate", "primary_se
 data_slim <- data[, columns_to_keep, drop = FALSE]
 
 data_slim %>%
-  select(-c(state_alpha, year, total_fatalities_rate)) %>%
+  select(-c(state_alpha)) %>%
   mutate_all(as.numeric) %>%  # Convert all columns to numeric
   cor() %>%
   melt() %>%
@@ -270,9 +270,7 @@ data_slim %>%
   theme(legend.title = element_blank(), legend.text = element_text(size = 10),
         axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)) +
   scale_fill_gradient2(low = "cornflowerblue", high = "coral", mid = "white",
-                       midpoint = 0, limit = c(-1, 1)) +
-  xlab("State") +
-  ylab("Total Fatalities Rate")
+                       midpoint = 0, limit = c(-1, 1))
 ```
 As with every EDA this semester, the goal of this EDA is not to document your own process of discovery -- save that for an exploration notebook -- but instead it is to bring a reader that is new to the data to a full understanding of the important features of your data as quickly as possible. In order to do this, your EDA should include a detailed, orderly narrative description of what you want your reader to know. Do not include any output -- tables, plots, or statistics -- that you do not intend to write about.
 
