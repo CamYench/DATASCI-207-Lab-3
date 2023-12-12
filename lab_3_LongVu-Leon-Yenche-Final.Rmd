@@ -37,25 +37,21 @@ Specifically, this data set contains data for the 48 continental U.S. states fro
 load(file="./data/driving.RData")
 
 ## please comment these calls in your work 
-glimpse(data)
-desc
+#glimpse(data)
+#desc
 ```
 
 
-```{r EDA Laws, warning=FALSE, echo=FALSE, message=FALSE}
+```{r Inspect data, warning=FALSE, echo=FALSE, message=FALSE}
+# Preliminary EDA 
 
-
-
-
-#print("seatbelt values not 0, 1 or 2")
+# Analyze seatbelt laws
 summary(data$seatbelt)
 sb<-data$seatbelt[ (data$seatbelt != 1) & (data$seatbelt != 2) & (data$seatbelt != 0)] 
 prop_sb<-length(sb)/length(data$seatbelt)
 head(sb)
 class(data$seatbelt)
 unique(data$seatbelt)
-#print("proportion:")
-#print(prop_sb)
 
 Variable <- c("Seatbelt Values")
 Proportion <- c(prop_sb)
@@ -63,172 +59,138 @@ Proportion <- c(prop_sb)
 prop_df <- data.frame(Variable, Proportion)
 
 
-#print("minim age values not 18 or 21")
+# Analyze minage laws
 summary(data$minage)
 sb<-data$minage[ (data$minage != 18) & (data$minage != 21) & (data$minage != 19) ]
 head(sb,5)
 class(data$minage)
 unique(data$minage)
 prop_sb<-length(sb)/ length(data$minage)
-print("proportion:")
-print(prop_sb)
+cat("proportion:", prop_sb)
+
 Variable <- c("Minimum Age")
 Proportion <- c(prop_sb)
 df <- data.frame(Variable, Proportion)
-prop_df<-rbind(prop_df, df)
+prop_df <- rbind(prop_df, df)
 
+# Inspect zero tolerance laws
 print("zero tolerance values not 0 or 1")
 sb<-data$zerotol[ (data$zerotol != 0) & (data$zerotol != 1) ]
 unique(data$zerotol)
 class(data$zerotol)
 prop_sb<-length(sb)/length(data$zerotol)
-#print("proportion:")
-#print(prop_sb)
+
 Variable <- c("Zero Tolerance")
 Proportion <- c(prop_sb)
 df <- data.frame(Variable, Proportion)
 prop_df<-rbind(prop_df, df)
 
-
-#print("gdl values not 0 or 1")
+# Inspect gdl
 unique(data$gdl)
 sb<-data$gdl[ (data$gdl != 0) & (data$gdl != 1) ]
 class(data$gdl)
 prop_sb<-length(sb)/length(data$gdl)
-#print("proportion:")
-#print(prop_sb)
+
 Variable <- c("gdl")
 Proportion <- c(prop_sb)
 df <- data.frame(Variable, Proportion)
 prop_df<-rbind(prop_df, df)
 
-
-
-#print("perse values not 0 or 1")
+# Inspect perse laws
 unique(data$perse)
 sb<-data$perse[ (data$perse != 0) & (data$perse != 1) ]
 class(data$perse)
 unique(data$perse)
 prop_sb<-length(sb)/length(data$perse)
-#print("proportion:")
-#print(prop_sb)
+
 Variable <- c("perse")
 Proportion <- c(prop_sb)
 df <- data.frame(Variable, Proportion)
 prop_df<-rbind(prop_df, df)
 
-
-
-
-
-
-#print("sl65 values not 0 or 1")
+# Inspect speed limit law data
 sb<-data$sl65[ (data$sl65 != 0) & (data$sl65 != 1)]
 unique(data$sl65)
 class(data$sl65)
 prop_sb<-length(sb)/length(data$sl65)
-#print("proportion:")
-#print(prop_sb)
+
 Variable <- c("sl 65")
 Proportion <- c(prop_sb)
 df <- data.frame(Variable, Proportion)
 prop_df<-rbind(prop_df, df)
 
-
-#print("sl70 values not 0 or 1")
 sb<-data$sl70[ (data$sl70 != 0) & (data$sl70 != 1)]
 unique(data$sl70)
 class(data$sl70)
 prop_sb<-length(sb)/length(data$sl70)
-#print("proportion:")
-#print(prop_sb)
+
 Variable <- c("sl 70")
 Proportion <- c(prop_sb)
 df <- data.frame(Variable, Proportion)
 prop_df<-rbind(prop_df, df)
 
-#print("sl75 values not 0 or 1")
 sb<-data$sl75[ (data$sl75 != 0) & (data$sl75 != 1)]
 unique(data$sl75)
 class(data$sl75)
 prop_sb<-length(sb)/length(data$sl75)
-#print("proportion:")
-#print(prop_sb)
+
 Variable <- c("sl 75")
 Proportion <- c(prop_sb)
 df <- data.frame(Variable, Proportion)
 prop_df<-rbind(prop_df, df)
 
-
-#print("sl70plus values not 0 or 1")
 sb<-data$sl70plus[ (data$sl70plus != 0) & (data$sl70plus!= 1) ]
 unique(data$sl70plus)
 class(data$sl70plus)
 prop_sb<-length(sb)/length(data$sl70plus)
-#print("proportion:")
-#print(prop_sb)
+
 Variable <- c("sl 70 plus")
 Proportion <- c(prop_sb)
 df <- data.frame(Variable, Proportion)
 prop_df<-rbind(prop_df, df)
 
-#print("sl55 values not 0 or 1")
 sb<-data$sl55[ (data$sl55 != 0) & (data$sl55 != 1)]
 unique(data$sl55)
 class(data$sl55)
 prop_sb<-length(sb)/length(data$sl55)
-#print("proportion:")
-#print(prop_sb)
+
 Variable <- c("sl 55")
 Proportion <- c(prop_sb)
 df <- data.frame(Variable, Proportion)
 prop_df<-rbind(prop_df, df)
 
-
-
-#print("bac10 values not 0 or 1")
+# Inspect bac laws
 sb<-data$bac10[ (data$bac10 != 0) & (data$bac10 != 1)]
 unique(data$bac10)
 class(data$bac10)
 prop_sb<-length(sb)/length(data$bac10)
-#print("proportion:")
-#print(prop_sb)
+
 Variable <- c("bac 10")
 Proportion <- c(prop_sb)
 df <- data.frame(Variable, Proportion)
 prop_df<-rbind(prop_df, df)
 
-#print("bac08 values not 0 or 1")
 sb<-data$bac08[ (data$bac08 != 0) & (data$bac08 != 1)]
 unique(data$bac08)
 class(data$bac08)
 prop_sb<-length(sb)/length(data$bac08)
-#print("proportion:")
-#print(prop_sb)
+
 Variable <- c("bac 08")
 Proportion <- c(prop_sb)
 df <- data.frame(Variable, Proportion)
 prop_df<-rbind(prop_df, df)
-
-
 ```
-
-
 
 ```{r print table}
-
 head(prop_df,20)
-
 ```
 
->As they are not zero or one only, but have fractions to represent what portion of the year they were implemented. We will have to round some of the numbers, since the entries, that are fractions, per the table above, show the proportion to be small. 
+> From inspection of the proportions of the one hot variables, we see that they are not true one-hot variables and there are, in fact, other intermediate values present in the data. To address this, we will have to round some of the numbers on a case by case basis to maintain a more uniform dataset to build models from. Note that the proportions of unexpected values in the data are quite low, so their manipulation (from rounding) will not significantly alter the general trends found in the data.'
 
-
-
-```{r wrangling}
+```{r Data wrangling BAC}
+# Unify and correct BAC limit data
 data %>% mutate(
   sum_bac = bac10 + bac08) %>% filter(sum_bac < 1 & sum_bac > 0) 
- 
 ```
 # (30 points, total) Build and Describe the Data 
 
@@ -238,27 +200,38 @@ data %>% mutate(
     - Produce a new variable for each of the other variables that are one-hot encoded (i.e. `bac*` variable series). 
     - Rename these variables to sensible names that are legible to a reader of your analysis. For example, the dependent variable as provided is called, `totfatrte`. Pick something more sensible, like, `total_fatalities_rate`. There are few enough of these variables to change, that you should change them for all the variables in the data. (You will thank yourself later.)
 
-```{r features creation, warning=FALSE, echo=FALSE, message=FALSE}
+```{r Build and Describe data, warning=FALSE, echo=FALSE, message=FALSE}
 data <- data %>% mutate(
+  # Create unified speed limit variable
   speed_limit = round(sl55) * 55 + round(sl65) * 65 + round(sl70) * 70 + round(sl75) * 75 + round(slnone) * 200,
   speed_limit_bin = case_when((speed_limit == 200 ) ~ "No speed limit",
                               (speed_limit == 55) & (speed_limit < 65) ~ "Speed limit 55",
                               (speed_limit == 65) & (speed_limit < 70) ~ "Speed limit 65",
                               (speed_limit >= 70) & (speed_limit < 200) ~ "Speed limit greater than 70"),
+  # Combine year of observation data into unified variable
   year_of_observation = year * (d80 + d81 + d82 + d83 + d84 + d85 + d86 + d87 +
                                 d88 + d89 + d90 + d91 + d92 + d93 + d94 + d95 +
                                 d96 + d97 + d98 + d99 + d00 + d01 + d02 + d03 + d04),
   year_of_observation = as.character(year_of_observation),
+  
+  # Create blood alcohol limit variable
   bld_alc_lmt = round(bac10) * 0.1 + round(bac08) * 0.08, 
   bld_alc_lmt_cat = case_when((bld_alc_lmt == 0) ~ "No blood alcohol lmt", 
                           (bld_alc_lmt == 0.1) ~ "blood alcohol lmt0.1",
                           (bld_alc_lmt == 0.08) ~ "blood alcohol lmt0.08"),
+  
+  # Create vehicle miles traveled per capita law variable
   veh_mile_trav_percap = vehicmiles*1000000000/statepop,
+  
+  # Round perse law data
   perse = round(perse),
+  
+  # Round zero tolerance law data
   zerotol = round(zerotol)
   
 )
 
+# Map states to state abbreviation
 uniq_state_num <- data %>% dplyr::select(state) %>% unique() 
 uniq_state_name <- c("AL", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY")
 
@@ -268,6 +241,7 @@ uniq_state <- uniq_state_num %>% mutate(
 
 data <- left_join(data, uniq_state, by = "state")
 
+# Rename variables (to be more sensible)
 data <- rename(data, speed_lim_55 = sl55,
                      speed_lim_65 = sl65,
                      speed_lim_70 = sl70,
@@ -301,49 +275,71 @@ data <- rename(data, speed_lim_55 = sl55,
 2. (5 points) Provide a description of the basic structure of the dataset. What is this data? How, where, and when is it collected? Is the data generated through a survey or some other method? Is the data that is presented a sample from the population, or is it a *census* that represents the entire population? Minimally, this should include:
     - How is the our dependent variable of interest `total_fatalities_rate` defined? 
     
-The dataset contains the total car fatalities rate from 1980 to 2004 for the 48 states in the US. The data is structured under a panel format. It is believed that the data was collected by National Highway Traffice Safety Administration (NHTSA). According to NHTSA, the traffic fatilities data is obtained from States' existing documents: police accident reports, state vehicle registration files and state driver licensing files. When dividing the total traffic fatalities by the state population, we obtained the result similar to total traffic fatality rate (fatalities per 100,000 of population), so it's likely the data represent the entire population within the 48 states. 
+> 'The dataset contains the total car fatalities rate from 1980 to 2004 for the 48 states in the US. The data is structured under a panel format. It is believed that the data was collected by National Highway Traffic Safety Administration (NHTSA). According to NHTSA, the traffic fatilities data is obtained from States' existing documents: police accident reports, state vehicle registration files and state driver licensing files. When dividing the total traffic fatalities by the state population, we obtained the result similar to total traffic fatality rate (fatalities per 100,000 of population), so it's likely the data represent the entire population within the 48 states.'
 
-As mentioned above, the `total_fatilities_rate` is the total traffic fatalities per 100,000 of population. A `total_facilities_rate` of 24 means for every 100,000 residents within the state, there are 24 fatalities due to traffic. 
+> 'As mentioned above, the `total_fatilities_rate` is the total traffic fatalities per 100,000 of population. A `total_facilities_rate` of 24 means for every 100,000 residents within the state, there are 24 fatalities due to traffic.'
 
-Besides fatilities data, the dataset also consists of traffic law data (speed limit, blood alcohol limit, per se law, seatbelt law, zero tolerance law), and other data that may correlate with traffic fatilities (minimum drinking age, vehicle travel miles, percentage of population with age from 14 to 24 and unemployment rate). 
+> 'Besides fatilities data, the dataset also consists of traffic law data (speed limit, blood alcohol limit, per se law, seatbelt law, zero tolerance law), and other data that may correlate with traffic fatilities (minimum drinking age, vehicle travel miles, percentage of population with age from 14 to 24 and unemployment rate).'
 
 3. (20 points) Conduct a very thorough EDA, which should include both graphical and tabular techniques, on the dataset, including both the dependent variable `total_fatalities_rate` and the potential explanatory variables. Minimally, this should include: 
     - How is the our dependent variable of interest `total_fatalities_rate` defined? 
     - What is the average of `total_fatalities_rate` in each of the years in the time period covered in this dataset? 
 
-As with every EDA this semester, the goal of this EDA is not to document your own process of discovery -- save that for an exploration notebook -- but instead it is to bring a reader that is new to the data to a full understanding of the important features of your data as quickly as possible. In order to do this, your EDA should include a detailed, orderly narrative description of what you want your reader to know. Do not include any output -- tables, plots, or statistics -- that you do not intend to write about.
-
 ```{r EDA, message=FALSE, echo=FALSE, warning=FALSE}
-data %>% ggplot(aes(x = year, y = tot_fata_per_100th_pop)) + geom_line() + facet_wrap(~state_name) + ggtitle("Total Trafic Fatilities Over Years by States")
+# Plot total traffic fatalities over time by state
+data %>% ggplot(aes(x = year, y = tot_fata_per_100th_pop)) + geom_line() + facet_wrap(~state_name) + ggtitle("Total Traffic Fatilities Over Years by States")
 
+# Plot Total Traffic Fatalities by state
+data %>% ggplot() + geom_boxplot(aes(y = tot_fata_per_100th_pop, x = factor(state_name))) + ggtitle("Total Traffic Fatalities by States")
 
-data %>% ggplot() + geom_boxplot(aes(y = tot_fata_per_100th_pop, x = factor(state_name))) + ggtitle("Total Trafic Fatalities by States")
+# Plot Total Traffic Fatalities by year
+data %>% ggplot() + geom_boxplot(aes(y = tot_fata_per_100th_pop, x = factor(year))) + ggtitle("Total Traffic Fatalities by Year")
 
+# Plot total Traffic Fatalities by speed limit category
+data %>% ggplot() + geom_boxplot(aes(y = tot_fata_per_100th_pop, x = factor(speed_limit_bin))) + ggtitle("Total Traffic Fatalitites by Speed Limit Category")
 
-data %>% ggplot() + geom_boxplot(aes(y = tot_fata_per_100th_pop, x = factor(year))) + ggtitle("Total Trafic Fatalities by Year")
-data %>% ggplot() + geom_boxplot(aes(y = tot_fata_per_100th_pop, x = factor(speed_limit_bin))) + ggtitle("Total Trafic Fatalitites by Speed Limit Category")
+# Create a slimmer data set
 data2 <- data %>% dplyr::select(tot_fata_per_100th_pop, night_fata_per_100th_pop, wkend_fata_per_100th_pop,
                          unemp_rate, age1424_pop_percent, veh_mile_trav)
 ggpairs(data2, columns = 1:6)
-data %>% ggplot() + geom_point(aes(y = tot_fata_per_100th_pop, x = night_fata_per_100th_pop)) + geom_smooth(aes(y = tot_fata_per_100th_pop, x = night_fata_per_100th_pop)) + facet_wrap(~state_name) + ggtitle("Total Fatalities vs Night Fatalities by State")
-data %>% ggplot() + geom_point(aes(y = tot_fata_per_100th_pop, x = wkend_fata_per_100th_pop)) + geom_smooth(aes(y = tot_fata_per_100th_pop, x = wkend_fata_per_100th_pop)) + facet_wrap(~state_name) + ggtitle("Total Fatalities vs Weekend Fatalities by State")
-data %>% ggplot() + geom_point(aes(y = tot_fata_per_100th_pop, x = unemp_rate)) + geom_smooth(aes(y = tot_fata_per_100th_pop, x = unemp_rate)) + facet_wrap(~state_name) + ggtitle("Total Fatalities vs Unemployment by State")
-data %>% ggplot() + geom_point(aes(y = tot_fata_per_100th_pop, x = age1424_pop_percent)) + geom_smooth(aes(y = tot_fata_per_100th_pop, x = age1424_pop_percent)) + facet_wrap(~state_name) + ggtitle("Total Fatalities vs Percent of People Younger than 24 by State")
-data %>% ggplot() + geom_point(aes(y = tot_fata_per_100th_pop, x = veh_mile_trav)) + geom_smooth(aes(y = tot_fata_per_100th_pop, x = veh_mile_trav)) + facet_wrap(~state_name) + ggtitle("Total Fatalities vs Miles Traveling")
-data %>% ggplot() + geom_boxplot(aes(y = tot_fata_per_100th_pop, x = factor(bld_alc_lmt_cat))) + ggtitle("Total Fatilities by Blood Alcohol Limit")
-data %>% ggplot() + geom_boxplot(aes(y = tot_fata_per_100th_pop, x = factor(bld_alc_lmt_cat))) + ggtitle("Total Fatilities by Blood Alcohol Limit") + facet_wrap(~state_name)
-data %>% ggplot() + geom_boxplot(aes(y = tot_fata_per_100th_pop, x = factor(per_se_law))) + ggtitle("Total Fatalities based on Per Se Law")
-data %>% ggplot() + geom_boxplot(aes(y = tot_fata_per_100th_pop, x = factor(seatbelt_law))) + ggtitle("Total Fatalities based on Seatbelt Law")
-data %>% ggplot() + geom_boxplot(aes(y = tot_fata_per_100th_pop, x = factor(zero_tol_law))) + ggtitle("Total Fatalities based on Zero Tolerance Law")
 
+# Plot Total Night Fatalities by state
+data %>% ggplot() + geom_point(aes(y = tot_fata_per_100th_pop, x = night_fata_per_100th_pop)) + geom_smooth(aes(y = tot_fata_per_100th_pop, x = night_fata_per_100th_pop)) + facet_wrap(~state_name) + ggtitle("Total Fatalities vs Night Fatalities by State")
+
+# Plot Total Weekend Fatalities by state
+data %>% ggplot() + geom_point(aes(y = tot_fata_per_100th_pop, x = wkend_fata_per_100th_pop)) + geom_smooth(aes(y = tot_fata_per_100th_pop, x = wkend_fata_per_100th_pop)) + facet_wrap(~state_name) + ggtitle("Total Fatalities vs Weekend Fatalities by State")
+
+# Plot Total Fatalities by Unemployment rate by state
+data %>% ggplot() + geom_point(aes(y = tot_fata_per_100th_pop, x = unemp_rate)) + geom_smooth(aes(y = tot_fata_per_100th_pop, x = unemp_rate)) + facet_wrap(~state_name) + ggtitle("Total Fatalities vs Unemployment by State")
+
+# Plot Total Fatalities versus age demographics by state
+data %>% ggplot() + geom_point(aes(y = tot_fata_per_100th_pop, x = age1424_pop_percent)) + geom_smooth(aes(y = tot_fata_per_100th_pop, x = age1424_pop_percent)) + facet_wrap(~state_name) + ggtitle("Total Fatalities vs Percent of People Younger than 24 by State")
+
+# Plot Total Fatalities versus miles travelled
+data %>% ggplot() + geom_point(aes(y = tot_fata_per_100th_pop, x = veh_mile_trav)) + geom_smooth(aes(y = tot_fata_per_100th_pop, x = veh_mile_trav)) + facet_wrap(~state_name) + ggtitle("Total Fatalities vs Miles Traveling")
+
+# Plot Total Fatalities by blood alcohol limit
+data %>% ggplot() + geom_boxplot(aes(y = tot_fata_per_100th_pop, x = factor(bld_alc_lmt_cat))) + ggtitle("Total Fatalities by Blood Alcohol Limit")
+
+# Plot Total Fatalities by blood alcohol limit by state
+data %>% ggplot() + geom_boxplot(aes(y = tot_fata_per_100th_pop, x = factor(bld_alc_lmt_cat))) + ggtitle("Total Fatalities by Blood Alcohol Limit") + facet_wrap(~state_name)
+
+# Plot Total Fatalities by per se laws
+data %>% ggplot() + geom_boxplot(aes(y = tot_fata_per_100th_pop, x = factor(per_se_law))) + ggtitle("Total Fatalities based on Per Se Law")
+
+# Plot Total Fatalities by seatbelt laws
+data %>% ggplot() + geom_boxplot(aes(y = tot_fata_per_100th_pop, x = factor(seatbelt_law))) + ggtitle("Total Fatalities based on Seatbelt Law")
+
+# Plot Total Fatalities by zero tolerance laws
+data %>% ggplot() + geom_boxplot(aes(y = tot_fata_per_100th_pop, x = factor(zero_tol_law))) + ggtitle("Total Fatalities based on Zero Tolerance Law")
 ```
 
-The above plots show the following: 
+> 'The above plots show the following: 
  - There is a high correlation between total traffic fatalities fatalities during night and weekend. This correlation appears to be similar among all states. 
- - Traffic fatalities are lower when there is law enforced (applicable to all laws included in the dataset, per se law, seat belt law, zero tolerance law, blood alcohol limit). On blood alcohol limit, higher limit seems to lead to higher total fatalities. It is difficult to see the same trend at the state level. 
+ - Traffic fatalities are lower when there is law enforced (applicable to all laws included in the dataset, per se law, seat belt law, zero tolerance law, blood alcohol limit). On blood alcohol limit, higher limit seems to lead to higher total fatalities. It is difficult to see the same trend at the state level.' 
  - There is a reduction in traffic fatalities from 1980 to 2004, although it could be due to the enforcement of trafic law
  - The downward trend of traffic fatalities seems to follow for all states
- - There do not seem to have high correlation between traffic fatalities with miles traveling, percent of people younger than 24 and unemployment rate for all states. There are exception but it maybe spurious correlation.
+ - There do not seem to have high correlation between traffic fatalities with miles traveling, percent of people younger than 24 and unemployment rate for all states. There are exception but it maybe spurious correlation.'
 
 # (15 points) Preliminary Model
 
@@ -357,28 +353,25 @@ Estimate a linear regression model of *totfatrte* on a set of dummy variables fo
     - Are the uncertainty estimate reliable, unbiased estimates of sampling based variability? Or, are they biased due to the way that the data is structured? 
 
 ```{r Preliminary Model, echo = FALSE, warning = FALSE, message = FALSE}
+# Craft Preliminary model
 pdata <- pdata.frame(data, index = c("state_name", "year")) 
 pre_model <- plm(tot_fata_per_100th_pop ~ year_of_observation, data = data, 
                  index = c("state_name", "year"), 
                  effect = "individual", model = "pooling")
 summary(pre_model)
 
+# Plot model performance
 pre_resid_fitted <- cbind(pre_model$residuals, pre_model$model[[1]] - pre_model$residuals)
 plot(pre_resid_fitted[1:nrow(pre_resid_fitted),2], pre_resid_fitted[1:nrow(pre_resid_fitted),1], xlab = "Fitted Value", ylab = "Residuals") 
-
-
 ```
 
+> 'The EDA shows a series of correlation between the response variable (total traffic fatality rate) and explanatory variables. As a result, a linear model is an appropriate approach to forecast the total traffic fatality rate.'
 
+> 'The model uses `1980` as the base year. Based on the output of the model, beside year `1981`, all other subsequent years have statistically significant impact on total traffic fatalities. The coefficient estimates of all years are negative, indicating a decrease in total fatalities from the `1980`.'
 
+> 'It's likely that there are omitted variables within the model, the parameter estimates are not reliable and likely overestimate/underestimate the impact of time on fatalities rate. One omitted variable that we suspect is the enforcement of traffic law which happened in the later years (1980 as the reference). The enforced traffic law would likely reduce the fatalities rate (as shown in the EDA section), which would imply that the impact from years on traffic fatalities is less than what the above model shows.'
 
-The EDA shows a series of correlation between the response variable (total traffic fatality rate) and explanatory variables. As a result, a linear model is an appropriate approach to forecast the total traffic fatality rate. 
-
-The model uses `1980` as the base year. Based on the output of the model, beside year `1981`, all other subsequent years have statistically significant impact on total traffic fatalities. The coefficient estimates of all years are negative, indicating a decrease in total fatalities from the `1980`. 
-
-It's likely that there are omitted variables within the model, the parameter estimates are not reliable and likely overestimate/underestimate the impact of time on fatalities rate. One omitted variable that we suspect is the enforcement of traffic law which happened in the later years (1980 as the reference). The enforced traffic law would likely reduce the fatalities rate (as shown in the EDA section), which would imply that the impact from years on traffic fatalities is less than what the above model shows. 
-
-Because the uncertainty of the model likely includes the effect of omitted variables, the uncertainty of the model is not reliable and may be biased. 
+> 'Because the uncertainty of the model likely includes the effect of omitted variables, the uncertainty of the model is not reliable and may be biased.' 
 
 # (15 points) Expanded Model 
 
@@ -401,24 +394,26 @@ If it is appropriate, include transformations of these variables. Please careful
 - Does having a primary seat belt law? 
 
 ```{r Expand model, echo = FALSE, message = FALSE, warning = FALSE}
+# Craft expanded model
 exp_model <- plm(formula = tot_fata_per_100th_pop ~ year_of_observation + bld_alc_lmt_cat + factor(per_se_law) +                                         factor(round(prim_seatbelt_law)) + factor(round(second_seatbelt_law)) + 
                  factor(round(speed_lim_grter70)) + factor(round(grad_driver_license_law)) +                                                             age1424_pop_percent + unemp_rate + veh_mile_trav_percap, data = data, 
                  index = c("state_name", "year"), 
                  effect = "individual", model = "pooling")
 summary(exp_model)
 
+# Plot model performance
 exp_resid_fitted <- cbind(exp_model$residuals, exp_model$model[[1]] - exp_model$residuals)
 plot(exp_resid_fitted[1:nrow(exp_resid_fitted),2], exp_resid_fitted[1:nrow(exp_resid_fitted),1], xlab = "Fitted Value", ylab = "Residuals") 
 
 lines(predict(lm(exp_resid_fitted[1:nrow(exp_resid_fitted),1]~exp_resid_fitted[1:nrow(exp_resid_fitted),2])),col='red')
 ```
-The team performed the following transformation on the raw dataset:
+> 'The team performed the following transformation on the raw dataset:
  - Generate a new variable to re-encode the blood-alcohol-limit columns (0.1 and 0.08). The values included in this variable is the sum product of variable `bld_alc_lim10` (named `bac10` in the raw data) with 0.10 and variable `bld_alc_lim08` (named `bac08` in the raw data) with 0.08. Then we convert the variable into categorical values (`Blood alcohol limit of 0.1` for rows with value of 0.1 and `Blood alcohol limit of 0.08` for rows with value of 0.08). For rows with zero values in both `bac10` and `bac08` column, we treated them as `No blood alcohol limit`. 
- - Generate a new variable to reflect miles travel per capita (total miles divided by state population)
+ - Generate a new variable to reflect miles travel per capita (total miles divided by state population)'
  
-From the output of the expanded model, r-squared increased from `r summary(pre_model)$r.squared[2]` to `r summary(exp_model)$r.squared[2]`, which indicates that the new model provides a significant increase of the explanation for the variance in the response variable. The coefficients for the years dummy variables also are smaller than the ones from the preliminary model. This confirms the suspicion that the impact on traffic fatalities rate from the time variable in the preliminary model was overestimated. Overall, we observed that impacts from `blood alcohol limit`, `per se law`, `speed limit law`, `unemployment rate` and `vehicle miles travel per capita` are statistically different from zero. Interestingly, some of the enforced laws such as `primary and secondary seatbelt law` and `graduate driver license law` did not seem to have a significant impact on the traffic fatalities. 
+> 'From the output of the expanded model, r-squared increased from `r summary(pre_model)$r.squared[2]` to `r summary(exp_model)$r.squared[2]`, which indicates that the new model provides a significant increase of the explanation for the variance in the response variable. The coefficients for the years dummy variables also are smaller than the ones from the preliminary model. This confirms the suspicion that the impact on traffic fatalities rate from the time variable in the preliminary model was overestimated. Overall, we observed that impacts from `blood alcohol limit`, `per se law`, `speed limit law`, `unemployment rate` and `vehicle miles travel per capita` are statistically different from zero. Interestingly, some of the enforced laws such as `primary and secondary seatbelt law` and `graduate driver license law` did not seem to have a significant impact on the traffic fatalities.'
 
-The `per se law` has a negative slope, which means that having the law enforced reduces the total traffic fatalities by `r coef(exp_model)[28]`. This confirms with the findings of our EDA. 
+> 'The `per se law` has a negative slope, which means that having the law enforced reduces the total traffic fatalities by `r coef(exp_model)[28]`. This confirms with the findings of our EDA.'
 
 The coefficient estimates of the `blood alcohol limt` indicates that when there is no alcohol limit law, fatality rates are higher than when blood alcohol limit is set at 0.1. When there is no blood alcohol limit or the limit is at 0.1, fatality rates are higher than when blood alcohol limit is set at 0.08. 
 
@@ -438,6 +433,7 @@ Which set of estimates do you think is more reliable? Why do you think this?
 
 
 ```{r State-Level Fixed Effects, echo = FALSE, warning = FALSE, message = FALSE}
+# Create state-level fixed effect model
 statefe_model <- plm(tot_fata_per_100th_pop ~ year_of_observation + bld_alc_lmt_cat +
                      factor(per_se_law) + factor(round(prim_seatbelt_law)) + factor(round(second_seatbelt_law)) +
                      factor(round(speed_lim_grter70)) + factor(round(grad_driver_license_law)) +                                                             age1424_pop_percent + unemp_rate + veh_mile_trav_percap, data = data, 
@@ -446,6 +442,7 @@ statefe_model <- plm(tot_fata_per_100th_pop ~ year_of_observation + bld_alc_lmt_
 
 summary(statefe_model)
 
+# Plot model
 statefe_resid_fitted <- cbind(statefe_model$residuals, statefe_model$model[[1]] - statefe_model$residuals)
 plot(statefe_resid_fitted[1:nrow(statefe_resid_fitted),2], statefe_resid_fitted[1:nrow(statefe_resid_fitted),1], xlab = "Fitted Value", ylab = "Residuals") 
 
@@ -465,24 +462,23 @@ pcdtest(statefe_model, test = "lm")
 
 pFtest(statefe_model, exp_model)
 ```
-The coefficient estimate for blood alcohol level limit at 0.1 changes from `r coef(exp_model)[26]` in the expanded model to `r coef(statefe_model)[25]` in the expanded model with state level fixed effect. This factor level also does not seem to be statistically significant among state. The coefficient estimate for no blood alcohol limit changes from `r coef(exp_model)[27]` in the expanded model to `r coef(statefe_model)[26]` in the fixed effect model. 
+> 'The coefficient estimate for blood alcohol level limit at 0.1 changes from `r coef(exp_model)[26]` in the expanded model to `r coef(statefe_model)[25]` in the expanded model with state level fixed effect. This factor level also does not seem to be statistically significant among state. The coefficient estimate for no blood alcohol limit changes from `r coef(exp_model)[27]` in the expanded model to `r coef(statefe_model)[26]` in the fixed effect model.' 
 
-The coefficient estimate for per se law changes from `r  coef(exp_model)[28]` in the expanded model to `r coef(statefe_model)[27]` in the expanded model with state level fixed effect. 
+> 'The coefficient estimate for per se law changes from `r  coef(exp_model)[28]` in the expanded model to `r coef(statefe_model)[27]` in the expanded model with state level fixed effect.'
 
-The coefficient estimate for primary seat-belt law changes from `r coef(exp_model)[29]` in the expanded model to `r coef(statefe_model)[28]` in the expanded model with state level fixed effect.
+> 'The coefficient estimate for primary seat-belt law changes from `r coef(exp_model)[29]` in the expanded model to `r coef(statefe_model)[28]` in the expanded model with state level fixed effect.'
 
-Both models seem to have residuals with zero mean and a mild level of heteroskedaticity, however, the t statistics of all three estimates are higher in the state-level fixed effect model, which indicates a narrower confidence interval for these estimates. As a result, we find the estimates of the state-level fixed effect model to be more reliable. 
+> 'Both models seem to have residuals with zero mean and a mild level of heteroskedaticity, however, the t statistics of all three estimates are higher in the state-level fixed effect model, which indicates a narrower confidence interval for these estimates. As a result, we find the estimates of the state-level fixed effect model to be more reliable.'
 
-For the estimates to be consisted, the model needs to satisfy the following assumptions: 
+> 'For the estimates to be consisted, the model needs to satisfy the following assumptions: 
  - The model is linear in parameters, the residual vs fitted value shows no pattern between the residuals and the model's fitted value, which indicate linearity. 
  - The observations are independent across individuals but not necessarily across time. This assumption may be difficult to satisfy as individuals in close by states may share similar characteristics. 
  - The regressors are not perfectly collinear and all regressors have non-zero variance and not too many extreme values. Based on the pair plots in the EDA section, it's unlikely that the regressors have perfect multicolinearity, or zero variance or contain too many extreme values. 
  - The error term is uncorrelated with all explanatory variables across all time period. The pair plot above shows that the residuals is not correlated with any explanatory variables within the model. 
- - Error term is homoskedastic and serially uncorrelated across time. The Durbin-Watson test shows a p-value of 0.988, which indicates that there is no serial correlation in the error term and satisfied this assumption. The Breusch-Pagan test indicates that the standard error is heteroskedasitc and robust standard error is a more appropriate method to determine confidence inteval for the coefficient estimates. 
+ - Error term is homoskedastic and serially uncorrelated across time. The Durbin-Watson test shows a p-value of 0.988, which indicates that there is no serial correlation in the error term and satisfied this assumption. The Breusch-Pagan test indicates that the standard error is heteroskedasitc and robust standard error is a more appropriate method to determine confidence inteval for the coefficient estimates.'
  
-The F test for individual effects indicates that we reject the null hypothesis of no fixed effects and thus the state-level fixed effect model provides more reliable coefficient estimates. 
+> 'The F test for individual effects indicates that we reject the null hypothesis of no fixed effects and thus the state-level fixed effect model provides more reliable coefficient estimates.'
  
-
 # (10 points) Consider a Random Effects Model 
 
 Instead of estimating a fixed effects model, should you have estimated a random effects model?
@@ -492,6 +488,7 @@ Instead of estimating a fixed effects model, should you have estimated a random 
 - If the assumptions are **not** met, then do not estimate the data. But, also comment on what the consequences would be if you were to *inappropriately* estimate a random effects model. Would your coefficient estimates be biased or not? Would your standard error estimates be biased or not? Or, would there be some other problem that might arise?
 
 ```{r random effect model, echo =FALSE, wanring = FALSE, message = FALSE}
+# Create random effect model
 statere_model <- plm(tot_fata_per_100th_pop ~ year_of_observation + bld_alc_lmt_cat +
                      factor(per_se_law) + factor(round(prim_seatbelt_law)) + factor(round(second_seatbelt_law)) + 
                      factor(round(speed_lim_grter70)) + factor(round(grad_driver_license_law)) +                                                             age1424_pop_percent + unemp_rate + veh_mile_trav_percap, data = data, 
@@ -499,6 +496,7 @@ statere_model <- plm(tot_fata_per_100th_pop ~ year_of_observation + bld_alc_lmt_
                      effect = "individual", model = "random")
 summary(statere_model)
 
+# Plot model
 statere_resid_fitted <- cbind(statere_model$residuals, statere_model$model[[1]] - statere_model$residuals)
 plot(statere_resid_fitted[1:nrow(statere_resid_fitted),2], statere_resid_fitted[1:nrow(statere_resid_fitted),1], xlab = "Fitted Value", ylab = "Residuals") 
 
@@ -507,18 +505,18 @@ lines(predict(lm(statere_resid_fitted[1:nrow(statere_resid_fitted),1]~statere_re
 phtest(statefe_model, statere_model)
 ```
 
-The random effect model uses all of the assumptions applied to the fixed model with the addition of the following assumptions: 
+> 'The random effect model uses all of the assumptions applied to the fixed model with the addition of the following assumptions: 
  - The unobserved effect is uncorrelated to all explanatory variables. This assumes the fixed effects at the state level are not correlated to the explanatory variable such as per se law, miles travel per, and speed limit. 
  - The expected value of the unobserved effect given the explanatory variables is constant. 
- - The variance of the unobserved effect given the explanatory variables is constant. 
+ - The variance of the unobserved effect given the explanatory variables is constant.'
  
-The first random effect assumption may likely be violated. The time-constant effect such as state location may have an impact on speed limit, which in turn may impact total fatalities rate. In addition, the location effect or state population may have an impact on miles travel per capita which in turn may impact total fatalities rate. 
+> 'The first random effect assumption may likely be violated. The time-constant effect such as state location may have an impact on speed limit, which in turn may impact total fatalities rate. In addition, the location effect or state population may have an impact on miles travel per capita which in turn may impact total fatalities rate.'
 
-If this assumption is violated, coefficient estimates become biased and not as reliable as the fixed effect model. 
+> 'If this assumption is violated, coefficient estimates become biased and not as reliable as the fixed effect model.'
 
-For comparison purposes, we developed the random effect model to confirm our evaluation of the model assumptions. 
+> 'For comparison purposes, we developed the random effect model to confirm our evaluation of the model assumptions.'
 
-The p-value of the Hausman test is less than 0.05, which means that we reject the null hypothese that the random effect model is appropriate. The test result also agrees with our evaluations of the random effect assumption and suggests that fixed effect model is a more appropriate approach. 
+> 'The p-value of the Hausman test is less than 0.05, which means that we reject the null hypothese that the random effect model is appropriate. The test result also agrees with our evaluations of the random effect assumption and suggests that fixed effect model is a more appropriate approach.'
 
 # (10 points) Model Forecasts 
 
@@ -534,10 +532,11 @@ Now, use these changes in driving to make forecasts from your models.
 - Suppose that the number of miles driven per capita, decreased by as much as the COVID bust. Using the FE estimates, what would the consequences be on the number of traffic fatalities? Please interpret the estimate.
 
 ```{r forecast, echo = FALSE, message = FALSE, warning = FALSE}
+# Import additional data
 updated_miles <- read.csv(file="./data/TRFVOLUSM227NFWA.csv")
 
 ## please comment these calls in your work 
-glimpse(updated_miles)
+#glimpse(updated_miles)
 updated_miles$DATE <- as.POSIXct(updated_miles$DATE)
 updated_miles <- updated_miles %>% mutate(
   year = year(DATE),
@@ -564,23 +563,20 @@ est_fata_max <- (us_mile_per_cap - us_mile_per_cap * traf_fata_max) * coef(state
 est_fata_min <- (us_mile_per_cap - us_mile_per_cap * traf_fata_min) * coef(statefe_model)[34]
 
 ```
-The team obtained the data from FRED Economic data. The data is the monthly vehicle miles traveled in the US from 1970. We averaged the vehicle miles traveled in 2020 and 2021 as a presentation for the travel during the pandemic. Overall, the traveling distance during the pandemic is lower than that in 2018. The team found that the smallest difference in terms of miles travel is in January with a difference of `r min(abs(um_wide$diff))` percent of 2018 miles traveled and the largest difference is in April with a difference of `r max(abs(um_wide$diff))`. The team then estimate the nation-wide miles traveled per capita from 1980 until 2004 to be `r us_mile_per_cap`. Hypothetically, if the miles traveled per capita reduces as much as the highest point during the pandemic, the nation-wide miles traveled per capita would be `r us_mile_per_cap * traf_fata_max` which would result in a reduction of `r (us_mile_per_cap - us_mile_per_cap * traf_fata_max)`. If the miles traveled per capita reduces as much as the lowest point during the pandemic, the nation_wide miles traveled per capita would be `r us_mile_per_cap * traf_fata_min` which would result in a reduction of `r (us_mile_per_cap - us_mile_per_cap * traf_fata_min)`. 
+> 'The team obtained the data from FRED Economic data. The data is the monthly vehicle miles traveled in the US from 1970. We averaged the vehicle miles traveled in 2020 and 2021 as a presentation for the travel during the pandemic. Overall, the traveling distance during the pandemic is lower than that in 2018. The team found that the smallest difference in terms of miles travel is in January with a difference of `r min(abs(um_wide$diff))` percent of 2018 miles traveled and the largest difference is in April with a difference of `r max(abs(um_wide$diff))`. The team then estimate the nation-wide miles traveled per capita from 1980 until 2004 to be `r us_mile_per_cap`. Hypothetically, if the miles traveled per capita reduces as much as the highest point during the pandemic, the nation-wide miles traveled per capita would be `r us_mile_per_cap * traf_fata_max` which would result in a reduction of `r (us_mile_per_cap - us_mile_per_cap * traf_fata_max)`. If the miles traveled per capita reduces as much as the lowest point during the pandemic, the nation_wide miles traveled per capita would be `r us_mile_per_cap * traf_fata_min` which would result in a reduction of `r (us_mile_per_cap - us_mile_per_cap * traf_fata_min)`.' 
 
-The coefficient estimate of the mile travel per capita is `r coef(statefe_model)[34]`, which means that for every mile traveled per capita increase, the traffic fatalities rate increases by `r coef(statefe_model)[34]`. If the mile traveled per capita decreases, the traffic fatalities rate would decrease accordingly. 
+> 'The coefficient estimate of the mile travel per capita is `r coef(statefe_model)[34]`, which means that for every mile traveled per capita increase, the traffic fatalities rate increases by `r coef(statefe_model)[34]`. If the mile traveled per capita decreases, the traffic fatalities rate would decrease accordingly.'
 
-The reduction of traffic fatalities would be `r est_fata_max` with the highest drop in mile traveled per capita and `r est_fata_min` with the lowest drop. 
-
+> 'The reduction of traffic fatalities would be `r est_fata_max` with the highest drop in mile traveled per capita and `r est_fata_min` with the lowest drop.' 
 
 # (5 points) Evaluate Error 
 
 If there were serial correlation or heteroskedasticity in the idiosyncratic errors of the model, what would be the consequences on the estimators and their standard errors? Is there any serial correlation or heteroskedasticity? 
 
-```{r Evaluate Error, echo = FALSE, warning = FALSE, message = FALSE} 
+```{r Evaluate Error, echo = FALSE, warning = FALSE, message = FALSE}
+# Conduct Durbin Watson test and Breusch-Paga Tests
 pdwtest(statefe_model)
 
 pcdtest(statefe_model, test = "lm")
-
-
 ```
-
-Both Breusch-Pagan and Durbin-Watson test show that the idiosyncratic error is heteroskedastic and serial correlated. Serial correlation in idiosyncratic would result in model coefficient estimates to be inefficient. And heteroskedastic would make the coefficient estimates unreliable as we cannot determine the true confidence interval for the parameters. For this model, using robust standard errors would be a more appropriate approach to estimate model coefficients. 
+> 'Both Breusch-Pagan and Durbin-Watson test show that the idiosyncratic error is heteroskedastic and serial correlated. Serial correlation in idiosyncratic would result in model coefficient estimates to be inefficient. And heteroskedastic would make the coefficient estimates unreliable as we cannot determine the true confidence interval for the parameters. For this model, using robust standard errors would be a more appropriate approach to estimate model coefficients.' 
