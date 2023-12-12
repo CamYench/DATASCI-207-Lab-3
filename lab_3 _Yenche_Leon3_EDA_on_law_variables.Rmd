@@ -1,0 +1,641 @@
+---
+title: 'Lab 3: Panel Models'
+subtitle: 'US Traffic Fatalities: 1980 - 2004'
+output: 
+  bookdown::pdf_document2: default
+---
+
+```{r load packages, echo=FALSE, message=FALSE}
+library(tidyverse)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(reshape2)
+library(ggthemes)
+library(plm)
+```
+
+
+# U.S. traffic fatalities: 1980-2004
+
+In this lab, we are asking you to answer the following **causal** question: 
+
+> **"Do changes in traffic laws affect traffic fatalities?"**  
+
+To answer this question, please complete the tasks specified below using the data provided in `data/driving.Rdata`. This data includes 25 years of data that cover changes in various state drunk driving, seat belt, and speed limit laws. 
+
+Specifically, this data set contains data for the 48 continental U.S. states from 1980 through 2004. Various driving laws are indicated in the data set, such as the alcohol level at which drivers are considered legally intoxicated. There are also indicators for “per se” laws—where licenses can be revoked without a trial—and seat belt laws. A few economics and demographic variables are also included. The description of the each of the variables in the dataset is also provided in the dataset. 
+
+```{r load data, echo = TRUE}
+load(file="./data/driving.RData")
+
+## please comment these calls in your work 
+#glimpse(data)
+#desc
+```
+
+
+# (30 points, total) Build and Describe the Data 
+
+1. (5 points) Load the data and produce useful features. Specifically: 
+    - Produce a new variable, called `speed_limit` that re-encodes the data that is in `sl55`, `sl65`, `sl70`, `sl75`, and `slnone`; 
+    - Produce a new variable, called `year_of_observation` that re-encodes the data that is in `d80`, `d81`, ... , `d04`. 
+    - Produce a new variable for each of the other variables that are one-hot encoded (i.e. `bac*` variable series). 
+    - Rename these variables to sensible names that are legible to a reader of your analysis. For example, the dependent variable as provided is called, `totfatrte`. Pick something more sensible, like, `total_fatalities_rate`. There are few enough of these variables to change, that you should change them for all the variables in the data. (You will thank yourself later.)
+    
+```{r inspect data}
+# Check the first few rows of the data
+head(data)
+```
+>For the following we expect these Law indicators to be 1 or 0. 
+
+```{r replicate}
+
+
+
+
+print("seatbelt values not 0, 1 or 2")
+summary(data$seatbelt)
+sb<-data$seatbelt[ (data$seatbelt != 1) & (data$seatbelt != 2) & (data$seatbelt != 0)] 
+prop_sb<-length(sb)/length(data$seatbelt)
+head(sb)
+class(data$seatbelt)
+unique(data$seatbelt)
+print("proportion:")
+print(prop_sb)
+
+Variable <- c("Seatbelt Values")
+Proportion <- c(prop_sb)
+
+prop_df <- data.frame(Variable, Proportion)
+
+
+print("minim age values not 18 or 21")
+summary(data$minage)
+sb<-data$minage[ (data$minage != 18) & (data$minage != 21) & (data$minage != 19) ]
+head(sb,5)
+class(data$minage)
+unique(data$minage)
+prop_sb<-length(sb)/ length(data$minage)
+print("proportion:")
+print(prop_sb)
+Variable <- c("Minimum Age")
+Proportion <- c(prop_sb)
+df <- data.frame(Variable, Proportion)
+prop_df<-rbind(prop_df, df)
+
+print("zero tolerance values not 0 or 1")
+sb<-data$zerotol[ (data$zerotol != 0) & (data$zerotol != 1) ]
+unique(data$zerotol)
+class(data$zerotol)
+prop_sb<-length(sb)/length(data$zerotol)
+print("proportion:")
+print(prop_sb)
+Variable <- c("Zero Tolerance")
+Proportion <- c(prop_sb)
+df <- data.frame(Variable, Proportion)
+prop_df<-rbind(prop_df, df)
+
+
+print("gdl values not 0 or 1")
+unique(data$gdl)
+sb<-data$gdl[ (data$gdl != 0) & (data$gdl != 1) ]
+class(data$gdl)
+prop_sb<-length(sb)/length(data$gdl)
+print("proportion:")
+print(prop_sb)
+Variable <- c("gdl")
+Proportion <- c(prop_sb)
+df <- data.frame(Variable, Proportion)
+prop_df<-rbind(prop_df, df)
+
+
+
+print("perse values not 0 or 1")
+unique(data$perse)
+sb<-data$perse[ (data$perse != 0) & (data$perse != 1) ]
+class(data$perse)
+unique(data$perse)
+prop_sb<-length(sb)/length(data$perse)
+print("proportion:")
+print(prop_sb)
+Variable <- c("perse")
+Proportion <- c(prop_sb)
+df <- data.frame(Variable, Proportion)
+prop_df<-rbind(prop_df, df)
+
+```
+
+```{r EDA on speed LAWS}
+
+
+
+
+print("sl65 values not 0 or 1")
+sb<-data$sl65[ (data$sl65 != 0) & (data$sl65 != 1)]
+unique(data$sl65)
+class(data$sl65)
+prop_sb<-length(sb)/length(data$sl65)
+print("proportion:")
+print(prop_sb)
+Variable <- c("sl 65")
+Proportion <- c(prop_sb)
+df <- data.frame(Variable, Proportion)
+prop_df<-rbind(prop_df, df)
+
+
+print("sl70 values not 0 or 1")
+sb<-data$sl70[ (data$sl70 != 0) & (data$sl70 != 1)]
+unique(data$sl70)
+class(data$sl70)
+prop_sb<-length(sb)/length(data$sl70)
+print("proportion:")
+print(prop_sb)
+Variable <- c("sl 70")
+Proportion <- c(prop_sb)
+df <- data.frame(Variable, Proportion)
+prop_df<-rbind(prop_df, df)
+
+print("sl75 values not 0 or 1")
+sb<-data$sl75[ (data$sl75 != 0) & (data$sl75 != 1)]
+unique(data$sl75)
+class(data$sl75)
+prop_sb<-length(sb)/length(data$sl75)
+print("proportion:")
+print(prop_sb)
+Variable <- c("sl 75")
+Proportion <- c(prop_sb)
+df <- data.frame(Variable, Proportion)
+prop_df<-rbind(prop_df, df)
+
+
+print("sl70plus values not 0 or 1")
+sb<-data$sl70plus[ (data$sl70plus != 0) & (data$sl70plus!= 1) ]
+unique(data$sl70plus)
+class(data$sl70plus)
+prop_sb<-length(sb)/length(data$sl70plus)
+print("proportion:")
+print(prop_sb)
+Variable <- c("sl 70 plus")
+Proportion <- c(prop_sb)
+df <- data.frame(Variable, Proportion)
+prop_df<-rbind(prop_df, df)
+
+print("sl55 values not 0 or 1")
+sb<-data$sl55[ (data$sl55 != 0) & (data$sl55 != 1)]
+unique(data$sl55)
+class(data$sl55)
+prop_sb<-length(sb)/length(data$sl55)
+print("proportion:")
+print(prop_sb)
+Variable <- c("sl 55")
+Proportion <- c(prop_sb)
+df <- data.frame(Variable, Proportion)
+prop_df<-rbind(prop_df, df)
+
+```
+```{r EDA on BAC}
+
+print("bac10 values not 0 or 1")
+sb<-data$bac10[ (data$bac10 != 0) & (data$bac10 != 1)]
+unique(data$bac10)
+class(data$bac10)
+prop_sb<-length(sb)/length(data$bac10)
+print("proportion:")
+print(prop_sb)
+Variable <- c("bac 10")
+Proportion <- c(prop_sb)
+df <- data.frame(Variable, Proportion)
+prop_df<-rbind(prop_df, df)
+
+print("bac08 values not 0 or 1")
+sb<-data$bac08[ (data$bac08 != 0) & (data$bac08 != 1)]
+unique(data$bac08)
+class(data$bac08)
+prop_sb<-length(sb)/length(data$bac08)
+print("proportion:")
+print(prop_sb)
+Variable <- c("bac 08")
+Proportion <- c(prop_sb)
+df <- data.frame(Variable, Proportion)
+prop_df<-rbind(prop_df, df)
+
+
+```
+
+
+>As they are not zero or one only, but have fractions to represent what portion of the year they were implement. 
+
+
+```{r print table}
+
+head(prop_df,20)
+
+```
+
+```{r Produce speed_limit}
+# Create a new variable speed_limit
+data$speed_limit <- 200
+
+# Recode the data
+data$speed_limit[data$sl55 == 1] <- 55
+data$speed_limit[data$sl65 == 1] <- 65
+data$speed_limit[data$sl70 == 1] <- 70
+data$speed_limit[data$sl75 == 1] <- 75
+data$speed_limit[data$slnone == 1] <- 200 # Chose 200 (because it represents a practical speed limit which most cars will not be able to reach it)
+
+# Convert the new variable to a factor
+data$speed_limit <- as.factor(data$speed_limit)
+
+# Summary of the new variable
+summary(data$speed_limit)
+```
+
+```{r Produce year_of_observation}
+# Extract year values where 1 hot encoding are hot
+year_columns <- grep("^d\\d{2}$", names(data))
+data$year_of_observation <- apply(data[year_columns], 1, function(row) {
+  non_zero_indices <- which(row != 0)
+  if (length(non_zero_indices) == 0) { # Case where there are no instances
+    NA 
+  } else { # Encode year when row value is non-zero
+    as.numeric(sub("d", "", names(data)[year_columns][non_zero_indices]))
+  }
+})
+
+# Check the values of year_of_observation
+head(data$year_of_observation, 30)
+```
+
+
+```{r Produce state_alpha}
+# Create remap function
+remap_state <- function(value) {
+  if (value > 2 & value < 9) {
+    return (value - 1)
+  } else if (value > 9 & value < 12) {
+    return (value - 2)
+  } else if (value > 12) {
+    return (value - 3)
+  } else {
+    return (value)
+  }
+}
+
+# Apply remap_state function
+data$state <- sapply(data$state, remap_state)
+
+# Define mapping of state codes to state alpha codes
+state_mapping <- c("AL", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY")
+
+# Create new variable with state alpha codes
+data$state_alpha <- state_mapping[data$state]
+
+# Check values of the new state variable
+head(data$state_alpha,100)
+```
+
+```{r Produce bac_limit}
+# Correct spurious values 
+data$bac08 <- round(data$bac08, 0)
+data$bac10 <- round(data$bac10, 0)
+
+# Create a new variable bac_limit
+data$bac_limit <- ifelse(data$bac08 == 1, 0.008, ifelse(data$bac10 == 1, 0.010, 0.05)) # When no bac limit is given, we use the bac which would be fatal
+
+# Check values of the new bac_limit variable
+head(data$bac_limit, 100)
+
+data$bac_limit <- as.factor(data$bac_limit)
+```
+
+```{r Rename variables}
+# Rename minage
+names(data)[names(data) == "minage"] <- "minimum_drinking_age"
+
+# Rename zerotol
+names(data)[names(data) == "zerotol"] <- "zero_tolerance_law"
+
+# Rename gdl
+names(data)[names(data) == "gdl"] <- "graduated_drivers_license_law"
+
+# Rename perse
+names(data)[names(data) == "perse"] <- "per_se_law"
+
+# Rename totfat
+names(data)[names(data) == "totfat"] <- "total_traffic_fatalities"
+
+# Rename nghtfat
+names(data)[names(data) == "nghtfat"] <- "total_nighttime_fatalities"
+
+# Rename wkndfat
+names(data)[names(data) == "wkndfat"] <- "total_weekend_fatalities"
+
+# Rename totfatpvm
+names(data)[names(data) == "totfatpvm"] <- "total_fatalities_per_100_mil"
+
+# Rename nghtfatpvm 
+names(data)[names(data) == "nghtfatpvm"] <- "nighttime_fatalities_per_100_mil"
+
+# Rename wkndfatpvm
+names(data)[names(data) == "wkndfatpvm"] <- "weekend_fatalities_per_100_mil"
+
+# Rename statepop
+names(data)[names(data) == "statepop"] <- "state_population"
+
+# Rename totfatrte
+names(data)[names(data) == "totfatrte"] <- "total_fatalities_rate"
+
+# Rename nghtfatrte
+names(data)[names(data) == "nghtfatrte"] <- "total_night_fatalities_rate"
+
+# Rename wkndfatrte
+names(data)[names(data) == "wkndfatrte"] <- "total_weekend_fatalities_rate"
+
+# Rename vehicmiles
+names(data)[names(data) == "vehicmiles"] <- "vehicle_miles_billions"
+
+# Rename unem
+names(data)[names(data) == "unem"] <- "unemployment_rate_percent"
+
+# Rename perc14_24
+names(data)[names(data) == "perc14_24"] <- "percent_pop_between_14_24"
+
+# Rename sbprim
+names(data)[names(data) == "sbprim"] <- "primary_seatbelt_law"
+
+# Rename sbsecon
+names(data)[names(data) == "sbsecon"] <- "secondary_seatbelt_law"
+```
+
+
+```{r convert laws to factors}
+
+
+
+data$minimum_drinking_age <- as.factor(data$minimum_drinking_age)
+data$zero_tolerance_law <- as.factor(data$zero_tolerance_law)
+data$graduated_drivers_license_law <- as.factor(data$graduated_drivers_license_law)
+data$per_se_law <- as.factor(data$per_se_law)
+data$primary_seatbelt_law <- as.factor(data$primary_seatbelt_law)
+data$secondary_seatbelt_law <- as.factor(data$secondary_seatbelt_law)
+
+
+
+```
+
+
+2. (5 points) Provide a description of the basic structure of the dataset. What is this data? How, where, and when is it collected? Is the data generated through a survey or some other method? Is the data that is presented a sample from the population, or is it a *census* that represents the entire population? Minimally, this should include:
+    - How is the our dependent variable of interest `total_fatalities_rate` defined? 
+
+> 'The dataset contains panel data; there are 1200 observations and 56 variables that includes 25 years of data (1980-2004) that cover changes in various state drunk driving, seat belt, and speed limit laws within the 48 continental United States and the associated fatality statistics.'
+
+> ' Below is an excerpt from wooldridge package (the source of the data) https://cran.r-project.org/web/packages/wooldridge/wooldridge.pdf (page 47):
+
+> 'Wooldridge Source: Freeman, D.G. (2007), “Drunk Driving Legislation and Traffic Fatalities: New Evidence on BAC 08 Laws,” Contemporary Economic Policy 25, 293–308. Professor Freeman kindly provided the data. Data loads lazily'
+
+> 'Further exploration of the data source (https://ideas.repec.org/a/bla/coecpo/v25y2007i3p293-308.html) reveals that the data is derived from U.S. state-level data. (Donald G. Freeman on google scholar: https://scholar.google.com/citations?user=aJvVDScAAAAJ&hl=en)
+
+> 'Based on the data being state-derived, it is highly likely that the data originates from police accident reports. This means that the total_falities_rate variable is the total number of fatalities for the state, as reported by police accident reports, divided by the state_population variable (i.e., the number of fatalities that occured as a part of roadway accident per year in each respective state divided by the state population).'
+
+
+3. (20 points) Conduct a very thorough EDA, which should include both graphical and tabular techniques, on the dataset, including both the dependent variable `total_fatalities_rate` and the potential explanatory variables. Minimally, this should include: 
+    - How is the our dependent variable of interest `total_fatalities_rate` defined? 
+    
+```{r EDA states}
+table(data$state_alpha)
+table(data$year)
+
+```
+>'Here we have observations of 48 units over 25 time periods (1 year), we have a balanced panel structure because each unit has the same number of observations over time.'
+
+
+
+    - What is the average of `total_fatalities_rate` in each of the years in the time period covered in this dataset? 
+
+```{r EDA: Missing Values}
+# Check for missing values
+missing_values <- colSums(is.na(data))
+print(missing_values)
+
+```
+```{r EDA Summary}
+summary(data$total_fatalities_rate)
+
+```
+
+```{r EDA trend states2}
+
+data %>%
+ggplot(aes(reorder(state_alpha,desc(total_fatalities_rate)),total_fatalities_rate,
+fill=state_alpha)) +
+geom_boxplot(alpha=0.4) +
+theme(legend.position="none",axis.text.y=element_text(size=6)) +
+scale_y_continuous() +
+xlab("State") +
+ylab("Total Fatalities Rate (per 100,000)") +
+coord_flip()
+```
+>'We see strong differences in Total Fatalities Rate across states, suggesting that fixed effects are important for controlling for unobserved differences.'
+
+```{r EDA change time}
+data %>%
+ggplot(aes(year,total_fatalities_rate,color=state_alpha)) +
+geom_point(alpha=0.4) +
+geom_smooth(method="lm") +
+facet_wrap(~state_alpha) +
+theme(legend.position="none",axis.text.x=element_text(angle=45,hjust=1,vjust=1,size=8),
+axis.text.y=element_text(size=8)) +
+theme(strip.text=element_text(size=4)) +
+scale_y_continuous() +
+xlab("State") +
+ylab("Total Fatalities")
+
+```
+>'Most states have a close to zero change over time, except for ND, CO, and NM, those states show a strong down slope over time.'
+
+```{r EDA Analyze trend from specific states}
+# Randomly select states to analyze
+selected_states <- sample(1:48, 10)
+selected_state_data  <- data[data$state %in% selected_states,]
+
+# Plot total_fatalities_rate over the years
+ggplot(selected_state_data , aes(x = year, y = total_fatalities_rate, color = selected_state_data$state_alpha)) +
+  geom_line() +
+  labs(title = "Total Fatalities Rate Over the Years for Selected States",
+       x = "Year", y = "Total Fatalities Rate (per 100,000)")
+```
+
+
+
+```{r EDA Correlation Heatmap}
+# Specify the columns to keep
+columns_to_keep <- c("state_alpha", "year", "total_fatalities_rate", "primary_seatbelt_law", "secondary_seatbelt_law", "speed_limit", "bac_limit", "zero_tolerance_law", "graduated_drivers_license_law", "per_se_law", "minimum_drinking_age", "unemployment_rate_percent", "state_population", "seatbelt")
+
+# Create a new dataset with only the selected columns
+data_slim <- data[, columns_to_keep, drop = FALSE]
+
+data_slim %>%
+  select(-c(state_alpha, year)) %>%
+  mutate_all(as.numeric) %>%  # Convert all columns to numeric
+  cor() %>%
+  melt() %>%
+  ggplot(aes(Var1, Var2, fill = value)) +
+  geom_tile() +
+  theme_economist_white(gray_bg = FALSE) +
+  theme(legend.title = element_blank(), legend.text = element_text(size = 10),
+        axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)) +
+  scale_fill_gradient2(low = "cornflowerblue", high = "coral", mid = "white",
+                       midpoint = 0, limit = c(-1, 1))
+
+
+
+```
+As with every EDA this semester, the goal of this EDA is not to document your own process of discovery -- save that for an exploration notebook -- but instead it is to bring a reader that is new to the data to a full understanding of the important features of your data as quickly as possible. In order to do this, your EDA should include a detailed, orderly narrative description of what you want your reader to know. Do not include any output -- tables, plots, or statistics -- that you do not intend to write about.
+
+# (15 points) Preliminary Model
+
+Estimate a linear regression model of *totfatrte* on a set of dummy variables for the years 1981 through 2004 and interpret what you observe. In this section, you should address the following tasks: 
+
+- Why is fitting a linear model a sensible starting place? 
+- What does this model explain, and what do you find in this model? 
+- Did driving become safer over this period? Please provide a detailed explanation.
+- What, if any, are the limitation of this model. In answering this, please consider **at least**: 
+    - Are the parameter estimates reliable, unbiased estimates of the truth? Or, are they biased due to the way that the data is structured?
+    - Are the uncertainty estimate reliable, unbiased estimates of sampling based variability? Or, are they biased due to the way that the data is structured? 
+    
+```{r Preliminary Model}
+# Craft preliminary model
+pre_model <- plm(total_fatalities_rate ~ year, data = data, 
+                 index = c("year", "state_alpha"), 
+                 effect = "individual", model = "pooling")
+summary(pre_model)
+
+# Plot preliminary model
+pre_resid_fitted <- cbind(pre_model$residuals, pre_model$model[[1]] - pre_model$residuals)
+plot(pre_resid_fitted[1:nrow(pre_resid_fitted),2], pre_resid_fitted[1:nrow(pre_resid_fitted),1], xlab = "Fitted Value", ylab = "Residuals") 
+```
+
+
+
+# (15 points) Expanded Model 
+
+Expand the **Preliminary Model** by adding variables related to the following concepts: 
+
+- Blood alcohol levels 
+- Per se laws
+- Primary seat belt laws (Note that if a law was enacted sometime within a year the fraction of the year is recorded in place of the zero-one indicator.)
+- Secondary seat belt laws 
+- Speed limits faster than 70 
+- Graduated drivers licenses 
+- Percent of the population between 14 and 24 years old
+- Unemployment rate
+- Vehicle miles driven per capita. 
+
+If it is appropriate, include transformations of these variables. Please carefully explain carefully your rationale, which should be based on your EDA, behind any transformation you made. If no transformation is made, explain why transformation is not needed. 
+
+- How are the blood alcohol variables defined? Interpret the coefficients that you estimate for this concept. 
+- Do *per se laws* have a negative effect on the fatality rate? 
+- Does having a primary seat belt law? 
+
+```{r Expanded Model}
+# Develop an expanded model
+expanded_model <- plm(total_fatalities_rate ~ speed_limit + bac_limit + primary_seatbelt_law + secondary_seatbelt_law + zero_tolerance_law + graduated_drivers_license_law + per_se_law + minimum_drinking_age, data = data_slim, 
+                 index = c("year", "state_alpha"), 
+                 effect = "individual", model = "pooling")
+summary(expanded_model)
+
+
+exp_model <- plm(tot_fata_per_100th_pop ~ year + bld_alc_lmt + per_se_law + prim_seatbelt_law 
+                 + second_seatbelt_law + speed_lim_grter70 + grad_driver_license_law +                                                    age1424_pop_percent + unemp_rate + veh_mile_trav_percap, data = pdata, 
+                 index = c("year", "state"), 
+                 effect = "individual", model = "pooling")
+summary(exp_model)
+
+exp_resid_fitted <- cbind(exp_model$residuals, exp_model$model[[1]] - exp_model$residuals)
+plot(exp_resid_fitted[1:nrow(exp_resid_fitted),2], exp_resid_fitted[1:nrow(exp_resid_fitted),1], xlab = "Fitted Value", ylab = "Residuals") 
+
+lines(predict(lm(exp_resid_fitted[1:nrow(exp_resid_fitted),1]~exp_resid_fitted[1:nrow(exp_resid_fitted),2])),col='red')
+
+```
+
+# (15 points) State-Level Fixed Effects 
+
+Re-estimate the **Expanded Model** using fixed effects at the state level. 
+
+- What do you estimate for coefficients on the blood alcohol variables? How do the coefficients on the blood alcohol variables change, if at all? 
+- What do you estimate for coefficients on per se laws? How do the coefficients on per se laws change, if at all? 
+- What do you estimate for coefficients on primary seat-belt laws? How do the coefficients on primary seatbelt laws change, if at all? 
+
+Which set of estimates do you think is more reliable? Why do you think this? 
+
+- What assumptions are needed in each of these models?  
+- Are these assumptions reasonable in the current context?
+
+```{r State-level Fixed Effects}
+statefe_model <- plm(tot_fata_per_100th_pop ~ year + state + bld_alc_lmt +per_se_law + prim_seatbelt_law 
+                     #+ second_seatbelt_law + speed_lim_grter70 + grad_driver_license_law +                                                    age1424_pop_percent + unemp_rate + veh_mile_trav_percap, data = pdata, 
+                 #index = c("year", "state"), 
+                 #effect = "individual", model = "pooling")
+summary(statefe_model)
+
+statefe_resid_fitted <- cbind(statefe_model$residuals, statefe_model$model[[1]] - statefe_model$residuals)
+plot(statefe_resid_fitted[1:nrow(statefe_resid_fitted),2], statefe_resid_fitted[1:nrow(statefe_resid_fitted),1], xlab = "Fitted Value", ylab = "Residuals") 
+
+lines(predict(lm(statefe_resid_fitted[1:nrow(statefe_resid_fitted),1]~statefe_resid_fitted[1:nrow(statefe_resid_fitted),2])),col='red')
+
+statefe.df  <- data %>% dplyr::select(bld_alc_lmt, per_se_law, prim_seatbelt_law, second_seatbelt_law, speed_lim_grter70,
+                                     grad_driver_license_law, age1424_pop_percent, unemp_rate, veh_mile_trav_percap) 
+statefe.df <- statefe.df %>% mutate(
+  mod_resid = statefe_model$residuals
+)
+
+ggpairs(statefe.df, column = 1:10)
+
+pdwtest(statefe_model)
+```
+
+# (10 points) Consider a Random Effects Model 
+
+Instead of estimating a fixed effects model, should you have estimated a random effects model?
+
+- Please state the assumptions of a random effects model, and evaluate whether these assumptions are met in the data. 
+- If the assumptions are, in fact, met in the data, then estimate a random effects model and interpret the coefficients of this model. Comment on how, if at all, the estimates from this model have changed compared to the fixed effects model. 
+- If the assumptions are **not** met, then do not estimate the data. But, also comment on what the consequences would be if you were to *inappropriately* estimate a random effects model. Would your coefficient estimates be biased or not? Would your standard error estimates be biased or not? Or, would there be some other problem that might arise?
+
+```{r Random Effects Model}
+statere_model <- plm(tot_fata_per_100th_pop ~ year + bld_alc_lmt +per_se_law + prim_seatbelt_law 
+                     + second_seatbelt_law + speed_lim_grter70 + grad_driver_license_law +                                                    age1424_pop_percent + unemp_rate + veh_mile_trav_percap, data = data, 
+                 index = c("state_name", "year"), 
+                 effect = "individual", model = "random")
+summary(statere_model)
+
+statere_resid_fitted <- cbind(statere_model$residuals, statere_model$model[[1]] - statere_model$residuals)
+plot(statere_resid_fitted[1:nrow(statere_resid_fitted),2], statere_resid_fitted[1:nrow(statere_resid_fitted),1], xlab = "Fitted Value", ylab = "Residuals") 
+
+lines(predict(lm(statere_resid_fitted[1:nrow(statere_resid_fitted),1]~statere_resid_fitted[1:nrow(statere_resid_fitted),2])),col='red')
+
+phtest(statefe_model, statere_model)
+```
+
+
+# (10 points) Model Forecasts 
+
+The COVID-19 pandemic dramatically changed patterns of driving. Find data (and include this data in your analysis, here) that includes some measure of vehicle miles driven in the US. Your data should at least cover the period from January 2018 to as current as possible. With this data, produce the following statements: 
+
+- Comparing monthly miles driven in 2018 to the same months during the pandemic: 
+  - What month demonstrated the largest decrease in driving? How much, in percentage terms, lower was this driving? 
+  - What month demonstrated the largest increase in driving? How much, in percentage terms, higher was this driving? 
+  
+Now, use these changes in driving to make forecasts from your models. 
+
+- Suppose that the number of miles driven per capita, increased by as much as the COVID boom. Using the FE estimates, what would the consequences be on the number of traffic fatalities? Please interpret the estimate.
+- Suppose that the number of miles driven per capita, decreased by as much as the COVID bust. Using the FE estimates, what would the consequences be on the number of traffic fatalities? Please interpret the estimate.
+
+```{r Model Forecasts}
+
+```
+
+# (5 points) Evaluate Error 
+
+If there were serial correlation or heteroskedasticity in the idiosyncratic errors of the model, what would be the consequences on the estimators and their standard errors? Is there any serial correlation or heteroskedasticity? 
